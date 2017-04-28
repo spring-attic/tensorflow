@@ -1,0 +1,53 @@
+//tag::ref-doc[]
+= TensorFlow Processor
+
+A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
+
+image::src/test/resources/TensorFlowProcessorArcutectureOverview.png[]
+
+The TensorFlow Processor uses a `TensorflowInputConverter` to convert the input data into data format compliant with the
+TensorFlow Model used. The input converter converts the input `Messagea into key/value `Map`, where
+the Key corresponds to a model input placeholder and the content is `org.tensorflow.DataType` compliant value.
+The default converter implementation expects either Map payload or flat json message that can be converted int a Map.
+
+The `TensorflowInputConverter` can be extended and customized. See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowInputConverter.java[TwitterSentimentTensorflowInputConverter.java] for example
+
+Processor's output uses `TensorflowOutputConverter` to convert the computed `Tensor` result into a serializable
+message. The default implementation uses `Tuple` triple.
+
+Custom `TensorflowOutputConverter` can provide more convenient data representations.
+See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java]
+
+
+Following snippet shows how to export any `TensorFlow` model (trained as well) into `ProtocolBuffer` binary format as required by the Processor.
+```python
+from tensorflow.python.framework.graph_util import convert_variables_to_constants
+...
+SAVE_DIR = os.path.abspath(os.path.curdir)
+minimal_graph = convert_variables_to_constants(sess, sess.graph_def, ['<model output>'])
+tf.train.write_graph(minimal_graph, SAVE_DIR, 'my_graph.proto', as_text=False)
+tf.train.write_graph(minimal_graph, SAVE_DIR, 'my.txt', as_text=True)
+```
+
+== Options
+
+The **$$tensorflow$$** $$processor$$ has the following options:
+
+//tag::configuration-properties[]
+$$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
+$$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.save-output-in-header$$:: $$Mark if the computed output has to stored in the outbound message's header or in the payload.
+ Note: The Kafka binder requires you to withe list the custom headers. Therefore if you set the
+ saveOutputInHeader to true the you have to start the SCDF server with this property:
+ <code>
+  --spring.cloud.dataflow.applicationProperties.stream.spring.cloud.stream.kafka.binder.headers=TF_OUTPUT,TF_INPUT
+ </code>$$ *($$Boolean$$, default: `$$false$$`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+== Build
+
+```
+$> mvn package
+```

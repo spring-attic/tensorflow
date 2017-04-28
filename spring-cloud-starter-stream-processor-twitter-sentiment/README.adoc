@@ -1,0 +1,34 @@
+//tag::ref-doc[]
+= Twitter Sentiment Analysis Processor
+
+A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
+It operationalizes the https://github.com/danielegrattarola/twitter-sentiment-cnn
+
+image::src/test/resources/SCDF_TF_Sentiment.png[]
+
+link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
+
+== Options
+
+The **$$twitter-sentiment$$** $$processor$$ has the following options:
+
+//tag::configuration-properties[]
+$$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
+$$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.save-output-in-header$$:: $$Mark if the computed output has to stored in the outbound message's header or in the payload.
+ Note: The Kafka binder requires you to withe list the custom headers. Therefore if you set the
+ saveOutputInHeader to true the you have to start the SCDF server with this property:
+ <code>
+  --spring.cloud.dataflow.applicationProperties.stream.spring.cloud.stream.kafka.binder.headers=TF_OUTPUT,TF_INPUT
+ </code>$$ *($$Boolean$$, default: `$$false$$`)*
+$$twitter.vocabulary-location$$:: $$The location of the word vocabulary file.
+ Note: the vocabulary must be the same used for training the model$$ *($$Resource$$, default: `$$<none>$$`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+== Build
+
+```
+$> mvn package
+```
