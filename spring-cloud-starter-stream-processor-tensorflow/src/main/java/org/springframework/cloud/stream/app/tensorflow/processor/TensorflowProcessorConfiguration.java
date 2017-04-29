@@ -158,9 +158,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 				else if (input.getPayload() instanceof Map) {
 					return (Map<String, Object>) input.getPayload();
 				}
-				else if (input.getPayload() instanceof Tuple) {
 
-				}
 				throw new RuntimeException("Unsupported input format: " + input);
 
 			}
