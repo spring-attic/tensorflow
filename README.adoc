@@ -1,6 +1,6 @@
 # Spring Cloud Stream TensorFlow Processor
 
-A processor that evaluates a machine learning models build with link:https://www.tensorflow.org/[TensorFlow] and stored
+A processor that evaluates a machine learning models built with link:https://www.tensorflow.org/[TensorFlow] and stored
 in link:https://developers.google.com/protocol-buffers/[Protocol Buffer] binary format.
 
 The TensorFlow processor uses link:https://www.tensorflow.org/api_docs/java/reference/org/tensorflow/package-summary[TensorFlow Java API] library.

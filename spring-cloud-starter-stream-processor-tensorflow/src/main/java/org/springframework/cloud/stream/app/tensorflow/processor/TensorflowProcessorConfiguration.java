@@ -67,14 +67,6 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	public static final String TF_OUTPUT_HEADER = "TF_OUTPUT";
 
 	/**
-	 * Note: The Kafka binder requires you to withe list the custom headers. Therefore if you set the
-	 * saveOutputInHeader to true the you have to start the SCDF server with this property:
-	 * <code>
-	 *  --spring.cloud.dataflow.applicationProperties.stream.spring.cloud.stream.kafka.binder.headers=TF_OUTPUT,TF_INPUT
-	 * </code>
-	 */
-
-	/**
 	 * Header name where the input is stored.
 	 * The default TensorflowInputConverter implementation will use TF_INPUT header if provided it over
 	 * the message payload.

@@ -29,6 +29,7 @@ import org.springframework.tuple.Tuple;
  * that can be send as a Message.
  *
  * The default implementation coverts the {@link Tensor} into {@link org.springframework.tuple.Tuple} with 3 elements:
+ *
  * <li>
  *     	"type"  : TensorFlow {@link org.tensorflow.DataType} name
  *      "shape" : TensorFlow's shape

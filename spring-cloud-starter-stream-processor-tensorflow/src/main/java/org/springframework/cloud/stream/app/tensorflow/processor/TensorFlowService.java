@@ -16,9 +16,6 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import static org.apache.commons.io.IOUtils.buffer;
-import static org.apache.commons.io.IOUtils.toByteArray;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -33,6 +30,7 @@ import org.tensorflow.Tensor;
 
 import org.springframework.core.io.Resource;
 import org.springframework.tuple.Tuple;
+import org.springframework.util.StreamUtils;
 
 /**
  * @author Christian Tzolov
@@ -45,10 +43,11 @@ public class TensorFlowService implements AutoCloseable {
 
 	public TensorFlowService(Resource modelLocation) throws IOException {
 		try (InputStream is = modelLocation.getInputStream()) {
+			if (logger.isInfoEnabled()) {
+				logger.info("Loading TensorFlow graph model: " + modelLocation);
+			}
 			graph = new Graph();
-			logger.info("Loading TensorFlow graph model: " + modelLocation );
-			graph.importGraphDef(toByteArray(buffer(is)));
-			logger.info("TensorFlow Graph Model Ready To Serve!");
+			graph.importGraphDef(StreamUtils.copyToByteArray(is));
 		}
 	}
 
