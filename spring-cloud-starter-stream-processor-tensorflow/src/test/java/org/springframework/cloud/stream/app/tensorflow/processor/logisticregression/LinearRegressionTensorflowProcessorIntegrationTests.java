@@ -17,6 +17,8 @@
 package org.springframework.cloud.stream.app.tensorflow.processor.logisticregression;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_SHAPE;
+import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_VALUE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ import org.tensorflow.Tensor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowProcessorConfiguration;
 import org.springframework.cloud.stream.messaging.Processor;
@@ -37,9 +40,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHandlingException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.tuple.Tuple;
+import org.springframework.tuple.TupleBuilder;
 
 /**
  * Integration Tests for TensorflowProcessor.
@@ -103,18 +109,39 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 			"tensorflow.saveOutputInHeader=false"
 	})
 	public static class LinearRegressionInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+		@Test
+		public void testEvaluationFLoatInput() {
+			testEvaluation(0.7f);
+		}
 
 		@Test
-		public void testEvaluation() {
-			Map<String, Float> inMap = new HashMap<>();
-			inMap.put("Placeholder", 0.7f);
+		public void testEvaluationWithTensorInput() {
+			testEvaluation(Tensor.create(0.7f));
+		}
+
+		@Test
+		public void testEvaluationWithTupleInput() {
+			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+		}
+
+		@Test(expected = MessageHandlingException.class)
+		public void testEvaluationIncorrectTupleInput() {
+			Tuple incompleteInputTuple = TupleBuilder.tuple()
+					//	missing data type
+					.put(TF_SHAPE, new long[0])
+					.put(TF_VALUE, new byte[0])
+					.build();
+			testEvaluation(incompleteInputTuple);
+		}
+
+		private void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
 
 			Message<?> msg = MessageBuilder.withPayload(inMap).build();
-
 			channels.input().send(msg);
-
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
-
 			Assert.assertThat((Float) received.getPayload(), equalTo(0.29999298f));
 		}
 	}

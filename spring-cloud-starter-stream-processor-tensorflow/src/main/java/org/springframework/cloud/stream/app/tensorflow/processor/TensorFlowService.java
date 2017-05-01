@@ -32,6 +32,7 @@ import org.tensorflow.Session.Runner;
 import org.tensorflow.Tensor;
 
 import org.springframework.core.io.Resource;
+import org.springframework.tuple.Tuple;
 
 /**
  * @author Christian Tzolov
@@ -54,27 +55,41 @@ public class TensorFlowService implements AutoCloseable {
 	public Tensor evaluate(Map<String, Object> feeds, String outputName, int outputIndex) {
 
 		try (Session session = new Session(graph)) {
+
 			Runner runner = session.runner();
+
+			// Keep tensor references to release them in the finally block
 			Tensor[] feedTensors = new Tensor[feeds.size()];
 			try {
 				int i = 0;
 				for (Entry<String, Object> e : feeds.entrySet()) {
-					Tensor tensor = Tensor.create(e.getValue());
-					runner = runner.feed(e.getKey(), tensor);
-					feedTensors[i++] = tensor;
+					String feedName = e.getKey();
+					feedTensors[i] = toFeedTensor(e.getValue());
+					runner = runner.feed(feedName, feedTensors[i]);
+					i++;
 				}
 				return runner.fetch(outputName).run().get(outputIndex);
 			}
 			finally {
-				if (feedTensors != null) {
-					for (Tensor tensor : feedTensors) {
-						if (tensor != null) {
-							tensor.close();
-						}
+				// Release all feed tensors
+				for (Tensor tensor : feedTensors) {
+					if (tensor != null) {
+						tensor.close();
 					}
 				}
 			}
 		}
+	}
+
+	private Tensor toFeedTensor(Object value) {
+		if (value instanceof Tensor) {
+			return (Tensor) value;
+		}
+		else if (value instanceof Tuple) {
+			return TensorTupleConverter.toTensor((Tuple) value);
+		}
+
+		return Tensor.create(value);
 	}
 
 	@Override
