@@ -40,26 +40,26 @@ import org.springframework.tuple.Tuple;
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
  *
- * Processor uses a {@link TensorflowInputConverter} to convert the input data into data format compliant with the
- * TensorFlow Model used. The input converter converts the input {@link Message} into key/value {@link Map}, where
- * the Key corresponds to a model input placeholder and the content is {@link org.tensorflow.DataType} compliant value.
- * The default converter implementation expects either Map payload or flat json message that can be converted int a Map.
+ * Processor uses a {@link TensorflowInputConverter} to convert the input data into TensorFlow model input format (called
+ * feeds). The input converter converts the input {@link Message} into key/value {@link Map},
+ * where the Key corresponds to a model input placeholder (feed) and the content is {@link org.tensorflow.DataType}
+ * compliant value. The default converter implementation expects either Map payload.
  *
  * The {@link TensorflowInputConverter} can be extended and customized.
  *
- * Processor's output uses {@link TensorflowOutputConverter} to convert the computed {@link Tensor} result into a serializable
- * message. The default implementation uses {@link Tuple} triple (see: {@link TensorflowOutputConverter}).
+ * Processor's output uses the {@link TensorflowOutputConverter} to convert the computed {@link Tensor} result into a
+ * serializable message. The default implementation converts the Tensor result into {@link Tuple} triple (see:
+ * {@link TensorflowOutputConverter}).
  *
- * Custom {@link TensorflowOutputConverter} can provide more convenient data representations.
- * (see TwitterSentimentTensorflowOutputConverter.java
+ * The {@link TensorflowOutputConverter} can be extended and customized to provide a convenient data representations,
+ * accustomed for a particular model
+ * (see TwitterSentimentTensorflowOutputConverter.java)
  *
  * @author Christian Tzolov
  */
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties(TensorflowProcessorProperties.class)
 public class TensorflowProcessorConfiguration implements AutoCloseable {
-
-	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
 
 	/**
 	 * Header name where the output is stored if the isSaveOutputInHeader is set
@@ -73,6 +73,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	 */
 	public static final String TF_INPUT_HEADER = "TF_INPUT";
 
+	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
 
 	@Autowired
 	private TensorflowProcessorProperties properties;
@@ -89,7 +90,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	private TensorFlowService tensorFlowService;
 
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-	public Message<?> evaluate(Message<?> input) {
+	public MessageBuilder evaluate(Message<?> input) {
 
 		Map<String, Object> processorContext = new ConcurrentHashMap<>();
 
@@ -101,21 +102,14 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
 		if (properties.isSaveOutputInHeader()) {
-			// Add the result to the message header
+			// Add the inference result to the message header
 			return MessageBuilder
 					.withPayload(input.getPayload())
-					.copyHeadersIfAbsent(input.getHeaders())
-					.setHeaderIfAbsent(TF_OUTPUT_HEADER, outputData)
-					.build();
+					.setHeaderIfAbsent(TF_OUTPUT_HEADER, outputData);
 		}
 
-		// Add the outputData as part of the message payload
-		Message<?> outputMessage = MessageBuilder
-				.withPayload(outputData)
-				.copyHeadersIfAbsent(input.getHeaders())
-				.build();
-
-		return outputMessage;
+		// Add the inference result to the message payload
+		return MessageBuilder.withPayload(outputData);
 	}
 
 	@Bean
