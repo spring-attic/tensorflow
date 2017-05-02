@@ -44,7 +44,7 @@ public class TensorTupleConverter {
 		buffer.clear();
 		byte[] bytes = new byte[buffer.capacity()];
 
-        buffer.get(bytes, 0, bytes.length);
+		buffer.get(bytes, 0, bytes.length);
 
 		return TupleBuilder.tuple()
 				.put(TF_DATA_TYPE, tensor.dataType().name())
