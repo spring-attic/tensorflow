@@ -83,31 +83,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@TestPropertySource(properties = {
-			"tensorflow.saveOutputInHeader=true"
-	})
-	public static class LinearRegressionInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
-
-		@Test
-		public void testEvaluationPositive() {
-			Map<String, Float> inMap = new HashMap<>();
-			inMap.put("Placeholder", 0.7f);
-			Message<?> msg = MessageBuilder.withPayload(inMap).build();
-
-			channels.input().send(msg);
-
-			Message<Map<String, Float>> received = (Message<Map<String, Float>>)
-					messageCollector.forChannel(channels.output()).poll();
-
-			Assert.assertThat((received.getPayload()), equalTo(inMap));
-			Assert.assertThat((Float) received.getHeaders().get(TensorflowProcessorConfiguration.TF_OUTPUT_HEADER),
-					equalTo(0.29999298f));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"tensorflow.saveOutputInHeader=false"
-	})
+	//@TestPropertySource(properties = {})
 	public static class LinearRegressionInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFLoatInput() {

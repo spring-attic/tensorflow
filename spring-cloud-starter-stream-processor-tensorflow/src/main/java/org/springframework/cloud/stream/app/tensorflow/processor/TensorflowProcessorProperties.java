@@ -46,11 +46,6 @@ public class TensorflowProcessorProperties {
 	 */
 	private int outputIndex = 0;
 
-	/**
-	 * Mark if the computed output has to be stored in the outbound message's header or in the payload.
-	 */
-	private boolean saveOutputInHeader = false;
-
 	@NotNull
 	public String getOutputName() {
 		return outputName;
@@ -75,13 +70,5 @@ public class TensorflowProcessorProperties {
 
 	public void setOutputIndex(int outputIndex) {
 		this.outputIndex = outputIndex;
-	}
-
-	public boolean isSaveOutputInHeader() {
-		return saveOutputInHeader;
-	}
-
-	public void setSaveOutputInHeader(boolean saveOutputInHeader) {
-		this.saveOutputInHeader = saveOutputInHeader;
 	}
 }

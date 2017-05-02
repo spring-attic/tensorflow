@@ -6,7 +6,7 @@ A processor that evaluates a machine learning model stored in TensorFlow Protobu
 image::src/test/resources/TensorFlowProcessorArcutectureOverview.png[]
 
 The TensorFlow Processor uses a `TensorflowInputConverter` to convert the input data into data format compliant with the
-TensorFlow Model used. The input converter converts the input `Messages into key/value `Map`, where
+TensorFlow Model used. The input converter converts the input `Messages` into key/value `Map`, where
 the Key corresponds to a model input placeholder and the content is `org.tensorflow.DataType` compliant value.
 The default converter implementation expects either Map payload or flat json message that can be converted into a Map.
 
@@ -37,7 +37,6 @@ The **$$tensorflow$$** $$processor$$ has the following options:
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
 $$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
-$$tensorflow.save-output-in-header$$:: $$Mark if the computed output has to be stored in the outbound message's header or in the payload.$$ *($$Boolean$$, default: `$$false$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]

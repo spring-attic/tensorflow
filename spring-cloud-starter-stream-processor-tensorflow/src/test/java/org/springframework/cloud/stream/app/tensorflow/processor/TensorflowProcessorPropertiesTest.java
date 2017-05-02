@@ -17,13 +17,11 @@
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -69,16 +67,6 @@ public class TensorflowProcessorPropertiesTest {
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
 		assertThat(properties.getOutputIndex(), equalTo(666));
 	}
-
-	@Test
-	public void saveOutputInHeaderCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.saveOutputInHeader:false");
-		context.register(Conf.class);
-		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertFalse(properties.isSaveOutputInHeader());
-	}
-
 
 	@Configuration
 	@EnableConfigurationProperties(TensorflowProcessorProperties.class)

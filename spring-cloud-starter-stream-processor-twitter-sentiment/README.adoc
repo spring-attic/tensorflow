@@ -16,7 +16,6 @@ The **$$twitter-sentiment$$** $$processor$$ has the following options:
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
 $$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
-$$tensorflow.save-output-in-header$$:: $$Mark if the computed output has to be stored in the outbound message's header or in the payload.$$ *($$Boolean$$, default: `$$false$$`)*
 $$twitter.vocabulary-location$$:: $$The location of the word vocabulary file.
  Note: the vocabulary must be the same used for training the model$$ *($$Resource$$, default: `$$<none>$$`)*
 //end::configuration-properties[]

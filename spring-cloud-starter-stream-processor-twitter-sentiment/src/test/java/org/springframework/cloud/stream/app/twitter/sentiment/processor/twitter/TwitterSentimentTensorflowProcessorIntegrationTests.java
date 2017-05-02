@@ -17,7 +17,6 @@
 package org.springframework.cloud.stream.app.twitter.sentiment.processor.twitter;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.cloud.stream.app.tensorflow.processor.TensorflowProcessorConfiguration.TF_OUTPUT_HEADER;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -33,7 +32,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -59,47 +57,29 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@TestPropertySource(properties = {"tensorflow.saveOutputInHeader=true"})
-	public static class OutputInHeaderTests extends TwitterSentimentTensorflowProcessorIntegrationTests {
+	public static class OutputInPayloadTests extends TwitterSentimentTensorflowProcessorIntegrationTests {
 
 		@Test
 		public void testEvaluationPositive() {
-			testEvaluationWithOutputInHeader(
-					"{\"text\": \"RT @PostGradProblem: In preparation for the NFL lockout ...\", \"id\":666, \"lang\":\"en\" }",
+			testEvaluation("{\"text\": \"RT @PostGradProblem: In preparation for the NFL lockout ...\", \"id\":666, \"lang\":\"en\" }",
 					"{\"sentiment\":\"POSITIVE\",\"text\":\"RT @PostGradProblem: In preparation for the NFL lockout ...\",\"id\":666,\"lang\":\"en\"}");
 		}
 
 		@Test
 		public void testEvaluationNegative() {
-			testEvaluationWithOutputInHeader(
-					"{\"text\": \"This is really bad\", \"id\":666, \"lang\":\"en\" }",
+			testEvaluation("{\"text\": \"This is really bad\", \"id\":666, \"lang\":\"en\" }",
 					"{\"sentiment\":\"NEGATIVE\",\"text\":\"This is really bad\",\"id\":666,\"lang\":\"en\"}");
 		}
 
-		private void testEvaluationWithOutputInHeader(String tweetJson, String resultJson) {
+
+		private void testEvaluation(String tweetJson, String resultJson) {
+
 			channels.input().send(MessageBuilder.withPayload(tweetJson).build());
 
 			Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
 
-			Assert.assertThat(received.getPayload(), equalTo(tweetJson));
-			Assert.assertThat(received.getHeaders().get(TF_OUTPUT_HEADER).toString(), equalTo(resultJson));
-		}
-	}
-
-	@TestPropertySource(properties = {"tensorflow.saveOutputInHeader=false"})
-	public static class OutputInPayloadTests extends TwitterSentimentTensorflowProcessorIntegrationTests {
-
-		@Test
-		public void testEvaluationPositive() {
-			String value = "{\"text\": \"RT @PostGradProblem: In preparation for the NFL lockout ...\", \"id\":666, \"lang\":\"en\" }";
-
-			channels.input().send(MessageBuilder.withPayload(value).build());
-
-			Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
-
 			Assert.assertTrue(received.getPayload().getClass().isAssignableFrom(String.class));
-			Assert.assertThat(received.getPayload().toString(),
-					equalTo("{\"sentiment\":\"POSITIVE\",\"text\":\"RT @PostGradProblem: In preparation for the NFL lockout ...\",\"id\":666,\"lang\":\"en\"}"));
+			Assert.assertThat(received.getPayload().toString(), equalTo(resultJson));
 		}
 	}
 

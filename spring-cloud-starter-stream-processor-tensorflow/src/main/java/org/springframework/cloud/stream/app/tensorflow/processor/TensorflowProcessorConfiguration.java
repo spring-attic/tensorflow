@@ -33,8 +33,8 @@ import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.tuple.Tuple;
 
 /**
@@ -61,18 +61,6 @@ import org.springframework.tuple.Tuple;
 @EnableConfigurationProperties(TensorflowProcessorProperties.class)
 public class TensorflowProcessorConfiguration implements AutoCloseable {
 
-	/**
-	 * Header name where the output is stored if the isSaveOutputInHeader is set
-	 */
-	public static final String TF_OUTPUT_HEADER = "TF_OUTPUT";
-
-	/**
-	 * Header name where the input is stored.
-	 * The default TensorflowInputConverter implementation will use TF_INPUT header if provided it over
-	 * the message payload.
-	 */
-	public static final String TF_INPUT_HEADER = "TF_INPUT";
-
 	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
 
 	@Autowired
@@ -90,7 +78,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	private TensorFlowService tensorFlowService;
 
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-	public MessageBuilder evaluate(Message<?> input) {
+	public Object evaluate(Message<?> input) {
 
 		Map<String, Object> processorContext = new ConcurrentHashMap<>();
 
@@ -101,15 +89,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		if (properties.isSaveOutputInHeader()) {
-			// Add the inference result to the message header
-			return MessageBuilder
-					.withPayload(input.getPayload())
-					.setHeaderIfAbsent(TF_OUTPUT_HEADER, outputData);
-		}
-
-		// Add the inference result to the message payload
-		return MessageBuilder.withPayload(outputData);
+		return outputData;
 	}
 
 	@Bean
@@ -138,15 +118,11 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 			@Override
 			public Map<String, Object> convert(Message<?> input, Map<String, Object> processorContext) {
 
-				if (input.getHeaders().containsKey(TF_INPUT_HEADER)) {
-					return (Map<String, Object>) input.getHeaders().get(TF_INPUT_HEADER, Map.class);
-				}
-				else if (input.getPayload() instanceof Map) {
+				if (input.getPayload() instanceof Map) {
 					return (Map<String, Object>) input.getPayload();
 				}
 
-				throw new RuntimeException("Unsupported input format: " + input);
-
+				throw new MessageConversionException("Unsupported input format: " + input);
 			}
 		};
 	}

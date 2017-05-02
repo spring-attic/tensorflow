@@ -60,7 +60,9 @@ public class TwitterSentimentProcessorConfiguration {
 	@Bean
 	@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() throws MalformedURLException {
-		logger.info("Load vocabulary: " + properties.getVocabularyLocation());
+		if (logger.isInfoEnabled()) {
+			logger.info("Load vocabulary: " + properties.getVocabularyLocation());
+		}
 		return new TwitterSentimentTensorflowInputConverter(properties.getVocabularyLocation());
 	}
 }
