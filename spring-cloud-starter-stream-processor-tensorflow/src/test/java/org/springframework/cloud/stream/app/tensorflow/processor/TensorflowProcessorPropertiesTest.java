@@ -68,6 +68,24 @@ public class TensorflowProcessorPropertiesTest {
 		assertThat(properties.getOutputIndex(), equalTo(666));
 	}
 
+	@Test
+	public void saveResultInHeaderCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.saveResultInHeader:true");
+		context.register(Conf.class);
+		context.refresh();
+		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		assertThat(properties.isSaveResultInHeader(), equalTo(true));
+	}
+
+	@Test
+	public void resultHeaderNameCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.resultHeaderName:blabla");
+		context.register(Conf.class);
+		context.refresh();
+		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		assertThat(properties.getResultHeaderName(), equalTo("blabla"));
+	}
+
 	@Configuration
 	@EnableConfigurationProperties(TensorflowProcessorProperties.class)
 	static class Conf {

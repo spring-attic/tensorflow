@@ -17,13 +17,13 @@
 package org.springframework.cloud.stream.app.tensorflow.processor.logisticregression;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_SHAPE;
 import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_VALUE;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.tensorflow.Tensor;
@@ -83,7 +83,9 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	//@TestPropertySource(properties = {})
+	@TestPropertySource(properties = {
+			"tensorflow.saveResultInHeader=false"
+	})
 	public static class LinearRegressionInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFLoatInput() {
@@ -115,10 +117,73 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 			Map<String, Object> inMap = new HashMap<>();
 			inMap.put("Placeholder", input);
 
-			Message<?> msg = MessageBuilder.withPayload(inMap).build();
-			channels.input().send(msg);
-			Message<?> received = messageCollector.forChannel(channels.output()).poll();
-			Assert.assertThat((Float) received.getPayload(), equalTo(0.29999298f));
+			Message<?> inputMessage = MessageBuilder
+					.withPayload(inMap)
+					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
+					equalTo("passThroughHeaderValue"));
+			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"tensorflow.saveResultInHeader=true",
+			"tensorflow.resultHeaderName=myheader"
+	})
+	public static class LinearRegressionInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+		@Test
+		public void testEvaluationFLoatInput() {
+			testEvaluation(0.7f);
+		}
+
+		@Test
+		public void testEvaluationWithTensorInput() {
+			testEvaluation(Tensor.create(0.7f));
+		}
+
+		@Test
+		public void testEvaluationWithTupleInput() {
+			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+		}
+
+		@Test(expected = MessageHandlingException.class)
+		public void testEvaluationIncorrectTupleInput() {
+			Tuple incompleteInputTuple = TupleBuilder.tuple()
+					//	missing data type
+					.put(TF_SHAPE, new long[0])
+					.put(TF_VALUE, new byte[0])
+					.build();
+			testEvaluation(incompleteInputTuple);
+		}
+
+		private void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Message<?> inputMessage = MessageBuilder
+					.withPayload(inMap)
+					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat("Original Message Payload must be preserver",
+					(Map<String, Object>) outputMessage.getPayload(), equalTo(inMap));
+
+			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
+					equalTo("passThroughHeaderValue"));
+
+			assertThat("Inference result must be stored in the header[myheader]",
+					(Float) outputMessage.getHeaders().get("myheader"), equalTo(0.29999298f));
 		}
 	}
 

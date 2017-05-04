@@ -37,6 +37,14 @@ The **$$tensorflow$$** $$processor$$ has the following options:
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
 $$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.result-header-name$$:: $$Applicable only for `saveResultInHeader=true`, this property holds the header name used to store
+ the inference result. The default name is `tf_result`.
+ If multiple tensorflow processors are connected in a single pipeline then make sure they have
+ distinct resultHeaderName values to avoid overriding.$$ *($$String$$, default: `$$tf_result$$`)*
+$$tensorflow.save-result-in-header$$:: $$Controls if the inference result is stored in the {@link org.springframework.messaging.Message} payload
+ or header.
+ By default (false) the result is stored in the payload. When set to true, the result will be
+ stored in the header using the resultHeaderName value.$$ *($$Boolean$$, default: `$$false$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]

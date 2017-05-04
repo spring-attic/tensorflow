@@ -46,6 +46,22 @@ public class TensorflowProcessorProperties {
 	 */
 	private int outputIndex = 0;
 
+	/**
+	 * Controls if the inference result is stored in the {@link org.springframework.messaging.Message} payload
+	 * or header.
+	 * By default (false) the result is stored in the payload. When set to true, the result will be
+	 * stored in the header using the resultHeaderName value.
+	 */
+	private boolean saveResultInHeader = false;
+
+	/**
+	 * Applicable only for `saveResultInHeader=true`, this property holds the header name used to store
+	 * the inference result. The default name is `tf_result`.
+	 * If multiple tensorflow processors are connected in a single pipeline then make sure they have
+	 * distinct resultHeaderName values to avoid overriding.
+	 */
+	private String resultHeaderName = "tf_result";
+
 	@NotNull
 	public String getOutputName() {
 		return outputName;
@@ -70,5 +86,21 @@ public class TensorflowProcessorProperties {
 
 	public void setOutputIndex(int outputIndex) {
 		this.outputIndex = outputIndex;
+	}
+
+	public boolean isSaveResultInHeader() {
+		return saveResultInHeader;
+	}
+
+	public void setSaveResultInHeader(boolean saveResultInHeader) {
+		this.saveResultInHeader = saveResultInHeader;
+	}
+
+	public String getResultHeaderName() {
+		return resultHeaderName;
+	}
+
+	public void setResultHeaderName(String resultHeaderName) {
+		this.resultHeaderName = resultHeaderName;
 	}
 }

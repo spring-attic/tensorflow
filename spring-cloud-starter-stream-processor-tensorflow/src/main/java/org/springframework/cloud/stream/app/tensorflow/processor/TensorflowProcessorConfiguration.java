@@ -35,6 +35,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.tuple.Tuple;
 
 /**
@@ -52,8 +53,11 @@ import org.springframework.tuple.Tuple;
  * {@link TensorflowOutputConverter}).
  *
  * The {@link TensorflowOutputConverter} can be extended and customized to provide a convenient data representations,
- * accustomed for a particular model
- * (see TwitterSentimentTensorflowOutputConverter.java)
+ * accustomed for a particular model (see TwitterSentimentTensorflowOutputConverter.java)
+ *
+ * By default the inference result is returned in the outbound Message payload. If the saveResultInHeader property is
+ * set to true then the inference result would be stored in the outbound Message header by name as set by
+ * the getResultHeaderName property. In this case the message payload is the same like the inbound message payload.
  *
  * @author Christian Tzolov
  */
@@ -78,7 +82,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	private TensorFlowService tensorFlowService;
 
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-	public Object evaluate(Message<?> input) {
+	public Message evaluate(Message<?> input) {
 
 		Map<String, Object> processorContext = new ConcurrentHashMap<>();
 
@@ -89,7 +93,23 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		return outputData;
+		// put result in the header
+		if (properties.isSaveResultInHeader()) {
+			if (logger.isWarnEnabled()) {
+				if (input.getHeaders().containsKey(properties.getResultHeaderName())) {
+					logger.warn("Existing header [" + properties + "] will be overrided!");
+				}
+			}
+			return MessageBuilder
+					.withPayload(input.getPayload())
+					.setHeaderIfAbsent(properties.getResultHeaderName(), outputData)
+					.build();
+		}
+
+		// put result in the payload
+		return MessageBuilder
+				.withPayload(outputData)
+				.build();
 	}
 
 	@Bean
