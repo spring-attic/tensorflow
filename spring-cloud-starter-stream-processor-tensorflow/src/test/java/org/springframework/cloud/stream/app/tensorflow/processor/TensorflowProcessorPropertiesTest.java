@@ -17,6 +17,7 @@
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Before;
@@ -69,21 +70,29 @@ public class TensorflowProcessorPropertiesTest {
 	}
 
 	@Test
-	public void saveResultInHeaderCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.saveResultInHeader:true");
+	public void resultHeaderCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.resultHeader:blabla");
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.isSaveResultInHeader(), equalTo(true));
+		assertThat(properties.getResultHeader(), equalTo("blabla"));
 	}
 
 	@Test
-	public void resultHeaderNameCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.resultHeaderName:blabla");
+	public void defaultResultHeaderTest() {
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.getResultHeaderName(), equalTo("blabla"));
+		assertNull(properties.getResultHeader());
+	}
+
+	@Test
+	public void inputHeaderCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.inputHeader:blabla");
+		context.register(Conf.class);
+		context.refresh();
+		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		assertThat(properties.getInputHeader(), equalTo("blabla"));
 	}
 
 	@Configuration

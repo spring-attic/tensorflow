@@ -35,9 +35,9 @@ import org.springframework.messaging.Message;
 public interface TensorflowInputConverter {
 	/**
 	 *
-	 * @param input Processor's input message
+	 * @param input Processor's input data.
 	 * @param processorContext Context used to share information between the Input and Output converters
 	 * @return Returns map that corresponds to the TensorFlow model's input format.
 	 */
-	Map<String, Object> convert(Message<?> input, Map<String, Object> processorContext);
+	Map<String, Object> convert(Object input, Map<String, Object> processorContext);
 }

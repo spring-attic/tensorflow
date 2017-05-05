@@ -47,20 +47,20 @@ public class TensorflowProcessorProperties {
 	private int outputIndex = 0;
 
 	/**
-	 * Controls if the inference result is stored in the {@link org.springframework.messaging.Message} payload
-	 * or header.
-	 * By default (false) the result is stored in the payload. When set to true, the result will be
-	 * stored in the header using the resultHeaderName value.
+	 * Controls if the inference result would be carried in the {@link org.springframework.messaging.Message} payload
+	 * or in header.
+	 * If the resultHeader is empty (default) the result is carried in the payload. If not empty then the result is
+	 * carried in the header using the resultHeader name.
+	 *
+	 * When multiple tensorflow processors in a single pipeline carry their results in the header make sure they
+	 * are configured with distinct resultHeader names.
 	 */
-	private boolean saveResultInHeader = false;
+	private String resultHeader;
 
 	/**
-	 * Applicable only for `saveResultInHeader=true`, this property holds the header name used to store
-	 * the inference result. The default name is `tf_result`.
-	 * If multiple tensorflow processors are connected in a single pipeline then make sure they have
-	 * distinct resultHeaderName values to avoid overriding.
+	 * If not empty, the processor will use the inputHeader content as data input instead of message's payload.
 	 */
-	private String resultHeaderName = "tf_result";
+	private String inputHeader;
 
 	@NotNull
 	public String getOutputName() {
@@ -88,19 +88,19 @@ public class TensorflowProcessorProperties {
 		this.outputIndex = outputIndex;
 	}
 
-	public boolean isSaveResultInHeader() {
-		return saveResultInHeader;
+	public String getResultHeader() {
+		return resultHeader;
 	}
 
-	public void setSaveResultInHeader(boolean saveResultInHeader) {
-		this.saveResultInHeader = saveResultInHeader;
+	public void setResultHeader(String resultHeader) {
+		this.resultHeader = resultHeader;
 	}
 
-	public String getResultHeaderName() {
-		return resultHeaderName;
+	public String getInputHeader() {
+		return inputHeader;
 	}
 
-	public void setResultHeaderName(String resultHeaderName) {
-		this.resultHeaderName = resultHeaderName;
+	public void setInputHeader(String inputHeader) {
+		this.inputHeader = inputHeader;
 	}
 }

@@ -37,6 +37,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.tuple.Tuple;
+import org.springframework.util.StringUtils;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -57,7 +58,7 @@ import org.springframework.tuple.Tuple;
  *
  * By default the inference result is returned in the outbound Message payload. If the saveResultInHeader property is
  * set to true then the inference result would be stored in the outbound Message header by name as set by
- * the getResultHeaderName property. In this case the message payload is the same like the inbound message payload.
+ * the getResultHeader property. In this case the message payload is the same like the inbound message payload.
  *
  * @author Christian Tzolov
  */
@@ -82,34 +83,35 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	private TensorFlowService tensorFlowService;
 
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
-	public Message evaluate(Message<?> input) {
+	public Object evaluate(Message<?> input) {
 
 		Map<String, Object> processorContext = new ConcurrentHashMap<>();
 
-		Map<String, Object> inputData = tensorflowInputConverter.convert(input, processorContext);
+		Object inputData = StringUtils.isEmpty(properties.getInputHeader())?
+				input.getPayload() : input.getHeaders().get(properties.getInputHeader());
+
+		Map<String, Object> inputDataMap = tensorflowInputConverter.convert(inputData, processorContext);
 
 		Tensor outputTensor = tensorFlowService.evaluate(
-				inputData, properties.getOutputName(), properties.getOutputIndex());
+				inputDataMap, properties.getOutputName(), properties.getOutputIndex());
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		// put result in the header
-		if (properties.isSaveResultInHeader()) {
+		// Put result in the header while the input payload is passed through
+		if (!StringUtils.isEmpty(properties.getResultHeader())) {
 			if (logger.isWarnEnabled()) {
-				if (input.getHeaders().containsKey(properties.getResultHeaderName())) {
-					logger.warn("Existing header [" + properties + "] will be overrided!");
+				if (input.getHeaders().containsKey(properties.getResultHeader())) {
+					logger.warn("Existing header [" + properties.getResultHeader() + "] will be overrided!");
 				}
 			}
 			return MessageBuilder
 					.withPayload(input.getPayload())
-					.setHeaderIfAbsent(properties.getResultHeaderName(), outputData)
+					.setHeader(properties.getResultHeader(), outputData)
 					.build();
 		}
 
-		// put result in the payload
-		return MessageBuilder
-				.withPayload(outputData)
-				.build();
+		// Put result in the payload
+		return outputData;
 	}
 
 	@Bean
@@ -136,10 +138,10 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 		return new TensorflowInputConverter() {
 
 			@Override
-			public Map<String, Object> convert(Message<?> input, Map<String, Object> processorContext) {
+			public Map<String, Object> convert(Object input, Map<String, Object> processorContext) {
 
-				if (input.getPayload() instanceof Map) {
-					return (Map<String, Object>) input.getPayload();
+				if (input instanceof Map) {
+					return (Map<String, Object>) input;
 				}
 
 				throw new MessageConversionException("Unsupported input format: " + input);

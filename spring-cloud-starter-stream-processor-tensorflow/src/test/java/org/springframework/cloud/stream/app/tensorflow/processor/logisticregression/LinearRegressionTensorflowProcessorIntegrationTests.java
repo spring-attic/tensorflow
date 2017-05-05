@@ -84,9 +84,9 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	protected MessageCollector messageCollector;
 
 	@TestPropertySource(properties = {
-			"tensorflow.saveResultInHeader=false"
+			"tensorflow.resultHeader="
 	})
-	public static class LinearRegressionInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+	public static class LinearRegressionResultInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFLoatInput() {
 			testEvaluation(0.7f);
@@ -133,10 +133,9 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	}
 
 	@TestPropertySource(properties = {
-			"tensorflow.saveResultInHeader=true",
-			"tensorflow.resultHeaderName=myheader"
+			"tensorflow.resultHeader=myheader"
 	})
-	public static class LinearRegressionInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+	public static class LinearRegressionResultInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFLoatInput() {
 			testEvaluation(0.7f);
@@ -169,7 +168,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 
 			Message<?> inputMessage = MessageBuilder
 					.withPayload(inMap)
-					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.setHeader("passThroughHeader", "passThroughHeaderValue")
 					.build();
 
 			channels.input().send(inputMessage);
@@ -179,13 +178,66 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 			assertThat("Original Message Payload must be preserver",
 					(Map<String, Object>) outputMessage.getPayload(), equalTo(inMap));
 
-			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
+			assertThat((String) outputMessage.getHeaders().get("passThroughHeader"),
 					equalTo("passThroughHeaderValue"));
 
 			assertThat("Inference result must be stored in the header[myheader]",
 					(Float) outputMessage.getHeaders().get("myheader"), equalTo(0.29999298f));
 		}
 	}
+
+	@TestPropertySource(properties = {
+			"tensorflow.inputHeader=myInputData"
+	})
+	public static class LinearRegressionInputDataIHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+		@Test
+		public void testEvaluationFLoatInput() {
+			testEvaluation(0.7f);
+		}
+
+		@Test
+		public void testEvaluationWithTensorInput() {
+			testEvaluation(Tensor.create(0.7f));
+		}
+
+		@Test
+		public void testEvaluationWithTupleInput() {
+			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+		}
+
+		@Test(expected = MessageHandlingException.class)
+		public void testEvaluationIncorrectTupleInput() {
+			Tuple incompleteInputTuple = TupleBuilder.tuple()
+					//	missing data type
+					.put(TF_SHAPE, new long[0])
+					.put(TF_VALUE, new byte[0])
+					.build();
+			testEvaluation(incompleteInputTuple);
+		}
+
+		private void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Message<?> inputMessage = MessageBuilder
+					.withPayload("Dummy Payload")
+					.setHeader("myInputData", inMap)
+					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
+					equalTo("passThroughHeaderValue"));
+			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+
+			assertThat((String) inputMessage.getPayload(), equalTo("Dummy Payload"));
+		}
+	}
+
 
 	@SpringBootApplication
 	@Import(TensorflowProcessorConfiguration.class)

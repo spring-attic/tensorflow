@@ -78,25 +78,24 @@ public class TwitterSentimentTensorflowInputConverter implements TensorflowInput
 	}
 
 	@Override
-	public Map<String, Object> convert(Message<?> input, Map<String, Object> processorContext) {
+	public Map<String, Object> convert(Object input, Map<String, Object> processorContext) {
 
 		try {
-			Object payload = input.getPayload();
 
-			if (payload instanceof String) {
-				Map tweetJsonMap = objectMapper.readValue((String) payload, Map.class);
+			if (input instanceof String) {
+				Map tweetJsonMap = objectMapper.readValue((String) input, Map.class);
 				processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, tweetJsonMap);
 				return getStringObjectMap(tweetJsonMap);
 			}
-			else if (payload instanceof Map) {
-				processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, payload);
-				return getStringObjectMap((Map) payload);
+			else if (input instanceof Map) {
+				processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, input);
+				return getStringObjectMap((Map) input);
 			}
 
-			throw new IllegalArgumentException("Unsupported payload type:" + input.getPayload());
+			throw new IllegalArgumentException("Unsupported payload type:" + input);
 		}
 		catch (IOException e) {
-			throw new RuntimeException("Can't parse input tweet json: " + input.getPayload());
+			throw new RuntimeException("Can't parse input tweet json: " + input);
 		}
 
 	}
