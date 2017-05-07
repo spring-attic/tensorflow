@@ -58,7 +58,12 @@ public class TensorflowProcessorProperties {
 	private String resultHeader;
 
 	/**
-	 * Specifies where the input data should comes from. Defaults to {@link org.springframework.messaging.Message}'s payload.
+	 * Specifies where to obtain the input data from. By default it looks
+	 * at the {@link org.springframework.messaging.Message}'s payload.
+	 * Instead one can obtain the input value from a payload {@link org.springframework.tuple.Tuple} like this:
+	 * 'tensorflow.inputExpression=payload.myInTupleName', where myInTupleName is a Tuple key.
+	 * To obtain input date from the message headers use expression like this:
+	 * 'tensorflow.inputExpression=headers[myHeaderName]', where is the name of the header that contains the input data.
 	 */
 	private String inputExpression = "payload";
 

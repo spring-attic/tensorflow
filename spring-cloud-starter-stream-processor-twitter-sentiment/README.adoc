@@ -13,7 +13,12 @@ link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Ana
 The **$$twitter-sentiment$$** $$processor$$ has the following options:
 
 //tag::configuration-properties[]
-$$tensorflow.input-expression$$:: $$Specifies where the input data should comes from. Defaults to {@link org.springframework.messaging.Message}'s payload.$$ *($$String$$, default: `$$payload$$`)*
+$$tensorflow.input-expression$$:: $$Specifies where to obtain the input data from. By default it looks
+ at the {@link org.springframework.messaging.Message}'s payload.
+ Instead one can obtain the input value from a payload {@link org.springframework.tuple.Tuple} like this:
+ 'tensorflow.inputExpression=payload.myInTupleName', where myInTupleName is a Tuple key.
+ To obtain input date from the message headers use expression like this:
+ 'tensorflow.inputExpression=headers[myHeaderName]', where is the name of the header that contains the input data.$$ *($$String$$, default: `$$payload$$`)*
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
 $$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*

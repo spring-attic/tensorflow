@@ -242,6 +242,58 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 		}
 	}
 
+	/**
+	 * Obtain an input data from Payload Tuple
+	 */
+	@TestPropertySource(properties = {
+			"tensorflow.inputExpression=payload.testTupleValue"
+	})
+	public static class LinearRegressionInputExpressionTupleTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+		@Test
+		public void testEvaluationFloatInput() {
+			testEvaluation(0.7f);
+		}
+
+		@Test
+		public void testEvaluationWithTensorInput() {
+			testEvaluation(Tensor.create(0.7f));
+		}
+
+		@Test
+		public void testEvaluationWithTupleInput() {
+			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+		}
+
+		@Test(expected = MessageHandlingException.class)
+		public void testEvaluationIncorrectTupleInput() {
+			Tuple incompleteInputTuple = TupleBuilder.tuple()
+					//	missing data type
+					.put(TF_SHAPE, new long[0])
+					.put(TF_VALUE, new byte[0])
+					.build();
+			testEvaluation(incompleteInputTuple);
+		}
+
+		private void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Tuple inTuple = TupleBuilder.tuple().of("testTupleValue", inMap);
+			Message<?> inputMessage = MessageBuilder
+					.withPayload(inTuple)
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+
+			assertThat((Tuple) inputMessage.getPayload(), equalTo(inTuple));
+		}
+	}
+
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(TensorflowProcessorConfiguration.class)
