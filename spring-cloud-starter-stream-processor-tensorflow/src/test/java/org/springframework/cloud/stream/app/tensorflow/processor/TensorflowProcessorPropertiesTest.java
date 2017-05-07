@@ -94,11 +94,11 @@ public class TensorflowProcessorPropertiesTest {
 
 	@Test
 	public void inputHeaderCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.inputHeader:blabla");
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.inputExpression:blabla");
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.getInputHeader(), equalTo("blabla"));
+		assertThat(properties.getInputExpression(), equalTo("blabla"));
 	}
 
 	@Configuration

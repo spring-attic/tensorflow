@@ -58,9 +58,9 @@ public class TensorflowProcessorProperties {
 	private String resultHeader;
 
 	/**
-	 * If not empty, the processor will use the inputHeader content as data input instead of message's payload.
+	 * Specifies where the input data should comes from. Defaults to {@link org.springframework.messaging.Message}'s payload.
 	 */
-	private String inputHeader;
+	private String inputExpression = "payload";
 
 	@NotNull
 	public String getOutputName() {
@@ -96,11 +96,11 @@ public class TensorflowProcessorProperties {
 		this.resultHeader = resultHeader;
 	}
 
-	public String getInputHeader() {
-		return inputHeader;
+	public String getInputExpression() {
+		return inputExpression;
 	}
 
-	public void setInputHeader(String inputHeader) {
-		this.inputHeader = inputHeader;
+	public void setInputExpression(String inputExpression) {
+		this.inputExpression = inputExpression;
 	}
 }

@@ -32,7 +32,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.handler.ExpressionEvaluatingMessageProcessor;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
@@ -82,13 +85,16 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	@Autowired
 	private TensorFlowService tensorFlowService;
 
+	@Autowired
+	private ExpressionEvaluatingMessageProcessor evaluatingMessageProcessor;
+
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public Object evaluate(Message<?> input) {
 
-		Map<String, Object> processorContext = new ConcurrentHashMap<>();
+		Object inputData = evaluatingMessageProcessor.processMessage(input);
 
-		Object inputData = StringUtils.isEmpty(properties.getInputHeader())?
-				input.getPayload() : input.getHeaders().get(properties.getInputHeader());
+		// The processorContext allows to convey metadata from the Input to Output converter.
+		Map<String, Object> processorContext = new ConcurrentHashMap<>();
 
 		Map<String, Object> inputDataMap = tensorflowInputConverter.convert(inputData, processorContext);
 
@@ -146,6 +152,12 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 				throw new MessageConversionException("Unsupported input format: " + input);
 			}
 		};
+	}
+
+	@Bean
+	public ExpressionEvaluatingMessageProcessor expressionEvaluatingMessageProcessor() {
+		Expression expression = new SpelExpressionParser().parseExpression(properties.getInputExpression());
+		return new ExpressionEvaluatingMessageProcessor<>(expression, Object.class);
 	}
 
 	@Override

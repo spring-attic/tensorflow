@@ -187,10 +187,13 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 		}
 	}
 
+	/**
+	 * Read input data from Message's header
+	 */
 	@TestPropertySource(properties = {
-			"tensorflow.inputHeader=myInputData"
+			"tensorflow.inputExpression=headers[myInputData]"
 	})
-	public static class LinearRegressionInputDataIHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
+	public static class LinearRegressionInputExpressionTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFloatInput() {
 			testEvaluation(0.7f);
