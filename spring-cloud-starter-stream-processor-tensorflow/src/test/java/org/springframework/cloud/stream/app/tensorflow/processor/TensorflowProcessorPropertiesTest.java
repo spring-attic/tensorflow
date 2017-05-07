@@ -76,23 +76,6 @@ public class TensorflowProcessorPropertiesTest {
 	}
 
 	@Test
-	public void resultHeaderCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.resultHeader:blabla");
-		context.register(Conf.class);
-		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.getResultHeader(), equalTo("blabla"));
-	}
-
-	@Test
-	public void defaultResultHeaderTest() {
-		context.register(Conf.class);
-		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertNull(properties.getResultHeader());
-	}
-
-	@Test
 	public void inputHeaderCanBeCustomized() {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.inputExpression:blabla");
 		context.register(Conf.class);

@@ -129,61 +129,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 
 			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
 					equalTo("passThroughHeaderValue"));
-			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"tensorflow.resultHeader=myheader"
-	})
-	public static class LinearRegressionResultInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
-		@Test
-		public void testEvaluationFloatInput() {
-			testEvaluation(0.7f);
-		}
-
-		@Test
-		public void testEvaluationWithTensorInput() {
-			testEvaluation(Tensor.create(0.7f));
-		}
-
-		@Test
-		public void testEvaluationWithTupleInput() {
-			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
-		}
-
-		@Test(expected = MessageHandlingException.class)
-		public void testEvaluationIncorrectTupleInput() {
-			Tuple incompleteInputTuple = TupleBuilder.tuple()
-					//	missing data type
-					.put(TF_SHAPE, new long[0])
-					.put(TF_VALUE, new byte[0])
-					.build();
-			testEvaluation(incompleteInputTuple);
-		}
-
-		private void testEvaluation(Object input) {
-
-			Map<String, Object> inMap = new HashMap<>();
-			inMap.put("Placeholder", input);
-
-			Message<?> inputMessage = MessageBuilder
-					.withPayload(inMap)
-					.setHeader("passThroughHeader", "passThroughHeaderValue")
-					.build();
-
-			channels.input().send(inputMessage);
-
-			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
-
-			assertThat("Original Message Payload must be preserver",
-					(Map<String, Object>) outputMessage.getPayload(), equalTo(inMap));
-
-			assertThat((String) outputMessage.getHeaders().get("passThroughHeader"),
-					equalTo("passThroughHeaderValue"));
-
-			assertThat("Inference result must be stored in the header[myheader]",
-					(Float) outputMessage.getHeaders().get("myheader"), equalTo(0.29999298f));
+			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
 		}
 	}
 
@@ -236,7 +182,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 
 			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
 					equalTo("passThroughHeaderValue"));
-			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
 
 			assertThat((String) inputMessage.getPayload(), equalTo("Dummy Payload"));
 		}
@@ -288,7 +234,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 
 			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
 
-			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
 
 			assertThat((Tuple) inputMessage.getPayload(), equalTo(inTuple));
 		}

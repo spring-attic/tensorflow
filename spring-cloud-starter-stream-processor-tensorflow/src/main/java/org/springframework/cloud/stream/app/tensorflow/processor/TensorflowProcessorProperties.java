@@ -47,17 +47,6 @@ public class TensorflowProcessorProperties {
 	private int outputIndex = 0;
 
 	/**
-	 * Controls if the inference result would be carried in the {@link org.springframework.messaging.Message} payload
-	 * or in header.
-	 * If the resultHeader is empty (default) the result is carried in the payload. If not empty then the result is
-	 * carried in the header using the resultHeader name.
-	 *
-	 * When multiple tensorflow processors in a single pipeline carry their results in the header make sure they
-	 * are configured with distinct resultHeader names.
-	 */
-	private String resultHeader;
-
-	/**
 	 * Specifies where to obtain the input data from. By default it looks
 	 * at the {@link org.springframework.messaging.Message}'s payload.
 	 * Instead one can obtain the input value from a payload {@link org.springframework.tuple.Tuple} like this:
@@ -91,14 +80,6 @@ public class TensorflowProcessorProperties {
 
 	public void setOutputIndex(int outputIndex) {
 		this.outputIndex = outputIndex;
-	}
-
-	public String getResultHeader() {
-		return resultHeader;
-	}
-
-	public void setResultHeader(String resultHeader) {
-		this.resultHeader = resultHeader;
 	}
 
 	public String getInputExpression() {

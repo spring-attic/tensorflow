@@ -36,11 +36,10 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.handler.ExpressionEvaluatingMessageProcessor;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.tuple.Tuple;
-import org.springframework.util.StringUtils;
+import org.springframework.tuple.TupleBuilder;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -68,6 +67,8 @@ import org.springframework.util.StringUtils;
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties(TensorflowProcessorProperties.class)
 public class TensorflowProcessorConfiguration implements AutoCloseable {
+
+	public static final String ORIGINAL_INPUT_DATA = "original.input.data";
 
 	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
 
@@ -103,20 +104,21 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		// Put result in the header while the input payload is passed through
-		if (!StringUtils.isEmpty(properties.getResultHeader())) {
-			if (logger.isWarnEnabled()) {
-				if (input.getHeaders().containsKey(properties.getResultHeader())) {
-					logger.warn("Existing header [" + properties.getResultHeader() + "] will be overrided!");
-				}
-			}
-			return MessageBuilder
-					.withPayload(input.getPayload())
-					.setHeader(properties.getResultHeader(), outputData);
+		TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
+
+		Object payload = input.getPayload();
+
+		if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
+			// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
+			// content of the existing tuple in the new tuple to be returned.
+			outTupleBuilder.putAll((Tuple) payload);
+		}
+		else {
+			// This is a new tuple so preserve the input data.
+			outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
 		}
 
-		// Put result in the payload
-		return outputData;
+		return outTupleBuilder.build();
 	}
 
 	@Bean

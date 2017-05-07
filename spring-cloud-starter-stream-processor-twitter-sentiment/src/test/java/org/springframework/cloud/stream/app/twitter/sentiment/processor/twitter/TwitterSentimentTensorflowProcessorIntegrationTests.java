@@ -34,6 +34,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.tuple.Tuple;
 
 /**
  * Integration Tests for TwitterSentimentTensorflowProcessor
@@ -79,7 +80,7 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
 
-			Assert.assertThat(received.getPayload().toString(), equalTo(resultJson));
+			Assert.assertThat(((Tuple)received.getPayload()).getString("output/Softmax"), equalTo(resultJson));
 		}
 	}
 
