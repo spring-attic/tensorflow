@@ -24,7 +24,7 @@ $$tensorflow.result-header$$:: $$Controls if the inference result would be carri
 
  When multiple tensorflow processors in a single pipeline carry their results in the header make sure they
  are configured with distinct resultHeader names.$$ *($$String$$, default: `$$<none>$$`)*
-$$twitter.vocabulary-location$$:: $$The location of the word vocabulary file.
+$$tensorflow.twitter.vocabulary-location$$:: $$The location of the word vocabulary file.
  Note: the vocabulary must be the same used for training the model$$ *($$Resource$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 

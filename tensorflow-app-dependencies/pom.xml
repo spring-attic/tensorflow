@@ -16,8 +16,7 @@
     </parent>
 
     <properties>
-        <pmml.version>1.2.6</pmml.version>
-		<tensorflow.version>1.1.0-rc2</tensorflow.version>
+		<tensorflow.version>1.1.0</tensorflow.version>
     </properties>
 
     <dependencyManagement>

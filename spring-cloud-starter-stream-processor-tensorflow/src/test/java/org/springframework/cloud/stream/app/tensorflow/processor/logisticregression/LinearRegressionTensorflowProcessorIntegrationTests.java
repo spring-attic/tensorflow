@@ -1,11 +1,11 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,7 +29,8 @@ import org.junit.runner.RunWith;
 import org.tensorflow.Tensor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
@@ -88,7 +89,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	})
 	public static class LinearRegressionResultInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
-		public void testEvaluationFLoatInput() {
+		public void testEvaluationFloatInput() {
 			testEvaluation(0.7f);
 		}
 
@@ -137,7 +138,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	})
 	public static class LinearRegressionResultInHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
-		public void testEvaluationFLoatInput() {
+		public void testEvaluationFloatInput() {
 			testEvaluation(0.7f);
 		}
 
@@ -191,7 +192,7 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	})
 	public static class LinearRegressionInputDataIHeaderTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
-		public void testEvaluationFLoatInput() {
+		public void testEvaluationFloatInput() {
 			testEvaluation(0.7f);
 		}
 
@@ -238,8 +239,8 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 		}
 	}
 
-
-	@SpringBootApplication
+	@SpringBootConfiguration
+	@EnableAutoConfiguration
 	@Import(TensorflowProcessorConfiguration.class)
 	public static class LogisticRegressionTensorflowProcessorApplication {
 
