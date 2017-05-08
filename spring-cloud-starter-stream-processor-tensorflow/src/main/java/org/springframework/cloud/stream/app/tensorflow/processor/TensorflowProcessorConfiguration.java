@@ -100,11 +100,11 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 		Map<String, Object> inputDataMap = tensorflowInputConverter.convert(inputData, processorContext);
 
 		Tensor outputTensor = tensorFlowService.evaluate(
-				inputDataMap, properties.getOutputName(), properties.getOutputIndex());
+				inputDataMap, properties.getModelFetchName(), properties.getModelFetchIndex());
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
+		TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getModelFetchName(), outputData);
 
 		Object payload = input.getPayload();
 

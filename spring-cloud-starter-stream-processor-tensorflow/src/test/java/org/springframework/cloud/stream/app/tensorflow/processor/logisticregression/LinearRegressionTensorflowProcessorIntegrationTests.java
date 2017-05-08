@@ -72,7 +72,7 @@ import org.springframework.tuple.TupleBuilder;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
 				"tensorflow.modelLocation=classpath:tensorflow/model/linear_regression_graph.proto",
-				"tensorflow.outputName=add"
+				"tensorflow.modelFetchName=add"
 		}
 )
 @DirtiesContext
@@ -84,9 +84,6 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@TestPropertySource(properties = {
-			"tensorflow.resultHeader="
-	})
 	public static class LinearRegressionResultInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
 		@Test
 		public void testEvaluationFloatInput() {

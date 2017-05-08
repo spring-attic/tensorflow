@@ -47,7 +47,7 @@ import org.springframework.tuple.Tuple;
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
 				"tensorflow.modelLocation=http://dl.bintray.com/big-data/generic/minimal_graph.proto",
-				"tensorflow.outputName=output/Softmax",
+				"tensorflow.modelFetchName=output/Softmax",
 				"tensorflow.twitter.vocabularyLocation=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext

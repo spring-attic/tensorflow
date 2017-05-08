@@ -37,14 +37,14 @@ public class TensorflowProcessorProperties {
 	private Resource modelLocation;
 
 	/**
-	 * The model graph output name
+	 * The graph model output name. Also know as fetch.
 	 */
-	private String outputName;
+	private String modelFetchName;
 
 	/**
-	 * The model graph output index
+	 * The graph model index withing the fetch Tensor.
 	 */
-	private int outputIndex = 0;
+	private int modelFetchIndex = 0;
 
 	/**
 	 * Specifies where to obtain the input data from. By default it looks
@@ -57,12 +57,12 @@ public class TensorflowProcessorProperties {
 	private String inputExpression = "payload";
 
 	@NotNull
-	public String getOutputName() {
-		return outputName;
+	public String getModelFetchName() {
+		return modelFetchName;
 	}
 
-	public void setOutputName(String outputName) {
-		this.outputName = outputName;
+	public void setModelFetchName(String modelFetchName) {
+		this.modelFetchName = modelFetchName;
 	}
 
 	@NotNull
@@ -74,12 +74,12 @@ public class TensorflowProcessorProperties {
 		this.modelLocation = modelLocation;
 	}
 
-	public int getOutputIndex() {
-		return outputIndex;
+	public int getModelFetchIndex() {
+		return modelFetchIndex;
 	}
 
-	public void setOutputIndex(int outputIndex) {
-		this.outputIndex = outputIndex;
+	public void setModelFetchIndex(int modelFetchIndex) {
+		this.modelFetchIndex = modelFetchIndex;
 	}
 
 	public String getInputExpression() {

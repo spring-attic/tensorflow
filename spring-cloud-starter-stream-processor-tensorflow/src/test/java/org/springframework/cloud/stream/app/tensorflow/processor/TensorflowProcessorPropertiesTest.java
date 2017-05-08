@@ -40,7 +40,7 @@ public class TensorflowProcessorPropertiesTest {
 	public void beforeTest() {
 		context = new AnnotationConfigApplicationContext();
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelLocation:NONE");
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.outputName:NONE");
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetchName:NONE");
 	}
 
 	@After
@@ -58,21 +58,21 @@ public class TensorflowProcessorPropertiesTest {
 	}
 
 	@Test
-	public void outputNameCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.outputName:output1");
+	public void modelFetchNameCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetchName:output1");
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.getOutputName(), equalTo("output1"));
+		assertThat(properties.getModelFetchName(), equalTo("output1"));
 	}
 
 	@Test
-	public void outputIndexCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.outputIndex:666");
+	public void modelFetchIndexCanBeCustomized() {
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetchIndex:666");
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
-		assertThat(properties.getOutputIndex(), equalTo(666));
+		assertThat(properties.getModelFetchIndex(), equalTo(666));
 	}
 
 	@Test

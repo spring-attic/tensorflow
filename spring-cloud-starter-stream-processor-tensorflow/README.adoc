@@ -40,9 +40,9 @@ $$tensorflow.input-expression$$:: $$Specifies where to obtain the input data fro
  'tensorflow.inputExpression=payload.myInTupleName', where myInTupleName is a Tuple key.
  To obtain input date from the message headers use expression like this:
  'tensorflow.inputExpression=headers[myHeaderName]', where is the name of the header that contains the input data.$$ *($$String$$, default: `$$payload$$`)*
+$$tensorflow.model-fetch-index$$:: $$The graph model index withing the fetch Tensor.$$ *($$Integer$$, default: `$$0$$`)*
+$$tensorflow.model-fetch-name$$:: $$The graph model output name. Also know as fetch.$$ *($$String$$, default: `$$<none>$$`)*
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
-$$tensorflow.output-index$$:: $$The model graph output index$$ *($$Integer$$, default: `$$0$$`)*
-$$tensorflow.output-name$$:: $$The model graph output name$$ *($$String$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]
