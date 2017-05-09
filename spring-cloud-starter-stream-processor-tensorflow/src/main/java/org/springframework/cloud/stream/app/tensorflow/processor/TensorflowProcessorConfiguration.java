@@ -32,10 +32,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.integration.handler.ExpressionEvaluatingMessageProcessor;
+import org.springframework.integration.context.IntegrationContextUtils;
+import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.tuple.Tuple;
@@ -73,6 +73,10 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
 
 	@Autowired
+	@Qualifier(IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME)
+	private EvaluationContext evaluationContext;
+
+	@Autowired
 	private TensorflowProcessorProperties properties;
 
 	@Autowired
@@ -86,13 +90,11 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	@Autowired
 	private TensorFlowService tensorFlowService;
 
-	@Autowired
-	private ExpressionEvaluatingMessageProcessor evaluatingMessageProcessor;
-
 	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public Object evaluate(Message<?> input) {
 
-		Object inputData = evaluatingMessageProcessor.processMessage(input);
+		Object inputData = properties.getExpression() == null?
+				input.getPayload() : properties.getExpression().getValue(evaluationContext, input, Object.class);
 
 		// The processorContext allows to convey metadata from the Input to Output converter.
 		Map<String, Object> processorContext = new ConcurrentHashMap<>();
@@ -104,21 +106,33 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
-		TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getModelFetchName(), outputData);
+		if (properties.getMode() == OutputMode.payload) {
+			//Payload
+			return outputData;
+		} else if (properties.getMode() == OutputMode.tuple) {
 
-		Object payload = input.getPayload();
+			//Tuple
+			TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
 
-		if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
-			// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
-			// content of the existing tuple in the new tuple to be returned.
-			outTupleBuilder.putAll((Tuple) payload);
+			Object payload = input.getPayload();
+
+			if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
+				// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
+				// content of the existing tuple in the new tuple to be returned.
+				outTupleBuilder.putAll((Tuple) payload);
+			}
+			else {
+				// This is a new tuple so preserve the input data.
+				outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
+			}
+
+			return outTupleBuilder.build();
 		}
-		else {
-			// This is a new tuple so preserve the input data.
-			outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
-		}
 
-		return outTupleBuilder.build();
+		//Headers
+		return MessageBuilder
+				.withPayload(input.getPayload())
+				.setHeader(properties.getOutputName(), outputData);
 	}
 
 	@Bean
@@ -154,12 +168,6 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 				throw new MessageConversionException("Unsupported input format: " + input);
 			}
 		};
-	}
-
-	@Bean
-	public ExpressionEvaluatingMessageProcessor expressionEvaluatingMessageProcessor() {
-		Expression expression = new SpelExpressionParser().parseExpression(properties.getInputExpression());
-		return new ExpressionEvaluatingMessageProcessor<>(expression, Object.class);
 	}
 
 	@Override

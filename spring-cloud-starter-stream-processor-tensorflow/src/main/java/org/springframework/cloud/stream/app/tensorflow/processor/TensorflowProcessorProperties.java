@@ -20,6 +20,8 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
+import org.springframework.expression.Expression;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -37,24 +39,46 @@ public class TensorflowProcessorProperties {
 	private Resource modelLocation;
 
 	/**
-	 * The graph model output name. Also know as fetch.
+	 * The graph model output. Name of TensorFlow operation to fetch the output Tensors from.
 	 */
 	private String modelFetchName;
 
 	/**
-	 * The graph model index withing the fetch Tensor.
+	 * Fetched operation (modelFetchName) returns a list of Tensors. The modelFetchIndex specifies which
+	 * Tensor from that list to use as an output.
 	 */
 	private int modelFetchIndex = 0;
 
 	/**
-	 * Specifies where to obtain the input data from. By default it looks
-	 * at the {@link org.springframework.messaging.Message}'s payload.
-	 * Instead one can obtain the input value from a payload {@link org.springframework.tuple.Tuple} like this:
-	 * 'tensorflow.inputExpression=payload.myInTupleName', where myInTupleName is a Tuple key.
-	 * To obtain input date from the message headers use expression like this:
-	 * 'tensorflow.inputExpression=headers[myHeaderName]', where is the name of the header that contains the input data.
+	 * Specifies where to obtain the input data from. When empty defaults to {@link org.springframework.messaging.Message}'s payload.
+	 * To obtain an input from a {@link org.springframework.tuple.Tuple} set:
+	 * 'tensorflow.expression=payload.myInTupleName', where myInTupleName is a Tuple key.
+	 * To obtain input date from a message header use:
+	 * 'tensorflow.expression=headers[myHeaderName]', where is the name of the header that contains the input data.
 	 */
-	private String inputExpression = "payload";
+	private Expression expression;
+
+	/**
+	 * Specifies how the outbound data is carried and whether the input message is mirrored in the output or discarded.
+	 *
+	 * The {@link OutputMode#payload} mode (default) stores the output data in the outbound message payload. The
+	 * input message payload is discarded.
+	 *
+	 * The {@link OutputMode#header} mode stores the output data in message's header under the
+	 * {@link TensorflowProcessorProperties#outputName} name. The the output message payload mirrors the input payload.
+	 *
+	 * The {@link OutputMode#tuple} mode stores the output data in the payload using a
+	 * {@link org.springframework.tuple.Tuple} structure. The output data is stored under the
+	 * {@link TensorflowProcessorProperties#outputName} key, while the input payload is passed through under the
+	 * {@link TensorflowProcessorConfiguration#ORIGINAL_INPUT_DATA} key.
+	 */
+	private OutputMode mode = OutputMode.payload;
+
+	/**
+	 * Applicable only for the {@link OutputMode#header} and {@link OutputMode#tuple} modes. Sets the output data key
+	 * either in the outbound Header or Tuple. If empty it defaults to the modelFetchName property.
+	 */
+	private String outputName;
 
 	@NotNull
 	public String getModelFetchName() {
@@ -82,11 +106,27 @@ public class TensorflowProcessorProperties {
 		this.modelFetchIndex = modelFetchIndex;
 	}
 
-	public String getInputExpression() {
-		return inputExpression;
+	public Expression getExpression() {
+		return expression;
 	}
 
-	public void setInputExpression(String inputExpression) {
-		this.inputExpression = inputExpression;
+	public void setExpression(Expression expression) {
+		this.expression = expression;
+	}
+
+	public OutputMode getMode() {
+		return mode;
+	}
+
+	public void setMode(OutputMode mode) {
+		this.mode = mode;
+	}
+
+	public String getOutputName() {
+		return StringUtils.isEmpty(outputName) ? getModelFetchName() : outputName;
+	}
+
+	public void setOutputName(String outputName) {
+		this.outputName = outputName;
 	}
 }

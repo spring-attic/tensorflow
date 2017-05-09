@@ -80,7 +80,7 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
 
-			Assert.assertThat(((Tuple)received.getPayload()).getString("output/Softmax"), equalTo(resultJson));
+			Assert.assertThat((String)received.getPayload(), equalTo(resultJson));
 		}
 	}
 

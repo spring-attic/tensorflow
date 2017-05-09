@@ -51,7 +51,7 @@ public class TensorFlowService implements AutoCloseable {
 		}
 	}
 
-	public Tensor evaluate(Map<String, Object> feeds, String outputName, int outputIndex) {
+	public Tensor evaluate(Map<String, Object> feeds, String fetchedOperationName, int outputTensorIndex) {
 
 		try (Session session = new Session(graph)) {
 
@@ -67,7 +67,7 @@ public class TensorFlowService implements AutoCloseable {
 					runner = runner.feed(feedName, feedTensors[i]);
 					i++;
 				}
-				return runner.fetch(outputName).run().get(outputIndex);
+				return runner.fetch(fetchedOperationName).run().get(outputTensorIndex);
 			}
 			finally {
 				// Release all feed tensors

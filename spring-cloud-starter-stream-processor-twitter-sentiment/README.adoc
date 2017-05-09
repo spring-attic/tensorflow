@@ -13,15 +13,29 @@ link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Ana
 The **$$twitter-sentiment$$** $$processor$$ has the following options:
 
 //tag::configuration-properties[]
-$$tensorflow.input-expression$$:: $$Specifies where to obtain the input data from. By default it looks
- at the {@link org.springframework.messaging.Message}'s payload.
- Instead one can obtain the input value from a payload {@link org.springframework.tuple.Tuple} like this:
- 'tensorflow.inputExpression=payload.myInTupleName', where myInTupleName is a Tuple key.
- To obtain input date from the message headers use expression like this:
- 'tensorflow.inputExpression=headers[myHeaderName]', where is the name of the header that contains the input data.$$ *($$String$$, default: `$$payload$$`)*
-$$tensorflow.model-fetch-index$$:: $$The graph model index withing the fetch Tensor.$$ *($$Integer$$, default: `$$0$$`)*
-$$tensorflow.model-fetch-name$$:: $$The graph model output name. Also know as fetch.$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.expression$$:: $$Specifies where to obtain the input data from. When empty defaults to {@link org.springframework.messaging.Message}'s payload.
+ To obtain an input from a {@link org.springframework.tuple.Tuple} set:
+ 'tensorflow.expression=payload.myInTupleName', where myInTupleName is a Tuple key.
+ To obtain input date from a message header use:
+ 'tensorflow.expression=headers[myHeaderName]', where is the name of the header that contains the input data.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$tensorflow.mode$$:: $$Specifies how the outbound data is carried and whether the input message is mirrored in the output or discarded.
+
+ The {@link OutputMode#payload} mode (default) stores the output data in the outbound message payload. The
+ input message payload is discarded.
+
+ The {@link OutputMode#header} mode stores the output data in message's header under the
+ {@link TensorflowProcessorProperties#outputName} name. The the output message payload mirrors the input payload.
+
+ The {@link OutputMode#tuple} mode stores the output data in the payload using a
+ {@link org.springframework.tuple.Tuple} structure. The output data is stored under the
+ {@link TensorflowProcessorProperties#outputName} key, while the input payload is passed through under the
+ {@link TensorflowProcessorConfiguration#ORIGINAL_INPUT_DATA} key.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
+$$tensorflow.model-fetch-index$$:: $$Fetched operation (modelFetchName) returns a list of Tensors. The modelFetchIndex specifies which
+ Tensor from that list to use as an output.$$ *($$Integer$$, default: `$$0$$`)*
+$$tensorflow.model-fetch-name$$:: $$The graph model output. Name of TensorFlow operation to fetch the output Tensors from.$$ *($$String$$, default: `$$<none>$$`)*
 $$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.output-name$$:: $$Applicable only for the {@link OutputMode#header} and {@link OutputMode#tuple} modes. Sets the output data key
+ either in the outbound Header or Tuple. If empty it defaults to the modelFetchName property.$$ *($$String$$, default: `$$<none>$$`)*
 $$tensorflow.twitter.vocabulary-location$$:: $$The location of the word vocabulary file.
  Note: the vocabulary must be the same used for training the model$$ *($$Resource$$, default: `$$<none>$$`)*
 //end::configuration-properties[]

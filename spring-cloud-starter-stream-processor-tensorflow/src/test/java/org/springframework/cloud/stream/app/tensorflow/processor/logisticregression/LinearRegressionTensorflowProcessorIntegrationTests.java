@@ -84,85 +84,63 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	public static class LinearRegressionResultInPayloadTests extends LinearRegressionTensorflowProcessorIntegrationTests {
-		@Test
-		public void testEvaluationFloatInput() {
-			testEvaluation(0.7f);
-		}
+	@Test
+	public void testEvaluationFloatInput() {
+		testEvaluation(0.7f);
+	}
 
-		@Test
-		public void testEvaluationWithTensorInput() {
-			testEvaluation(Tensor.create(0.7f));
-		}
+	@Test
+	public void testEvaluationWithTensorInput() {
+		testEvaluation(Tensor.create(0.7f));
+	}
 
-		@Test
-		public void testEvaluationWithTupleInput() {
-			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
-		}
+	@Test
+	public void testEvaluationWithTupleInput() {
+		testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+	}
 
-		@Test(expected = MessageHandlingException.class)
-		public void testEvaluationIncorrectTupleInput() {
-			Tuple incompleteInputTuple = TupleBuilder.tuple()
-					//	missing data type
-					.put(TF_SHAPE, new long[0])
-					.put(TF_VALUE, new byte[0])
-					.build();
-			testEvaluation(incompleteInputTuple);
-		}
+	@Test(expected = MessageHandlingException.class)
+	public void testEvaluationIncorrectTupleInput() {
+		Tuple incompleteInputTuple = TupleBuilder.tuple()
+				//	missing data type
+				.put(TF_SHAPE, new long[0])
+				.put(TF_VALUE, new byte[0])
+				.build();
+		testEvaluation(incompleteInputTuple);
+	}
 
-		private void testEvaluation(Object input) {
+	protected abstract void testEvaluation(Object input);
+
+	public static class DefaultInputDefaultOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
+
+		@Override
+		protected void testEvaluation(Object input) {
 
 			Map<String, Object> inMap = new HashMap<>();
 			inMap.put("Placeholder", input);
 
 			Message<?> inputMessage = MessageBuilder
 					.withPayload(inMap)
-					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.setHeader("passthrough", "passthrough")
 					.build();
 
 			channels.input().send(inputMessage);
 
 			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
 
-			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
-					equalTo("passThroughHeaderValue"));
-			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
+			assertThat((String) outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
+
+			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
 		}
 	}
 
-	/**
-	 * Read input data from Message's header
-	 */
 	@TestPropertySource(properties = {
-			"tensorflow.inputExpression=headers[myInputData]"
+			"tensorflow.expression=headers[myInputData]",
+			"tensorflow.mode=payload"
 	})
-	public static class LinearRegressionInputExpressionTests extends LinearRegressionTensorflowProcessorIntegrationTests {
-		@Test
-		public void testEvaluationFloatInput() {
-			testEvaluation(0.7f);
-		}
-
-		@Test
-		public void testEvaluationWithTensorInput() {
-			testEvaluation(Tensor.create(0.7f));
-		}
-
-		@Test
-		public void testEvaluationWithTupleInput() {
-			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
-		}
-
-		@Test(expected = MessageHandlingException.class)
-		public void testEvaluationIncorrectTupleInput() {
-			Tuple incompleteInputTuple = TupleBuilder.tuple()
-					//	missing data type
-					.put(TF_SHAPE, new long[0])
-					.put(TF_VALUE, new byte[0])
-					.build();
-			testEvaluation(incompleteInputTuple);
-		}
-
-		private void testEvaluation(Object input) {
+	public static class HeaderInputPayloadOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
+		@Override
+		protected void testEvaluation(Object input) {
 
 			Map<String, Object> inMap = new HashMap<>();
 			inMap.put("Placeholder", input);
@@ -170,54 +148,56 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 			Message<?> inputMessage = MessageBuilder
 					.withPayload("Dummy Payload")
 					.setHeader("myInputData", inMap)
-					.setHeader("passThroughHeaderName", "passThroughHeaderValue")
+					.setHeader("passthrough", "passthrough")
 					.build();
 
 			channels.input().send(inputMessage);
 
 			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
 
-			assertThat((String) outputMessage.getHeaders().get("passThroughHeaderName"),
-					equalTo("passThroughHeaderValue"));
+			assertThat((String) outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
+
+			assertThat((Float) outputMessage.getPayload(), equalTo(0.29999298f));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"tensorflow.expression=headers[myInputData]",
+			"tensorflow.mode=tuple"
+	})
+	public static class HeaderInputTupleOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
+
+		@Override
+		protected void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Message<?> inputMessage = MessageBuilder
+					.withPayload("Dummy Payload")
+					.setHeader("myInputData", inMap)
+					.setHeader("passthrough", "passthrough")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat((String) outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
 			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
 
 			assertThat((String) inputMessage.getPayload(), equalTo("Dummy Payload"));
 		}
 	}
 
-	/**
-	 * Obtain an input data from Payload Tuple
-	 */
 	@TestPropertySource(properties = {
-			"tensorflow.inputExpression=payload.testTupleValue"
+			"tensorflow.expression=payload.testTupleValue",
+			"tensorflow.mode=tuple"
 	})
-	public static class LinearRegressionInputExpressionTupleTests extends LinearRegressionTensorflowProcessorIntegrationTests {
-		@Test
-		public void testEvaluationFloatInput() {
-			testEvaluation(0.7f);
-		}
+	public static class TupleInputTupleOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
 
-		@Test
-		public void testEvaluationWithTensorInput() {
-			testEvaluation(Tensor.create(0.7f));
-		}
-
-		@Test
-		public void testEvaluationWithTupleInput() {
-			testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
-		}
-
-		@Test(expected = MessageHandlingException.class)
-		public void testEvaluationIncorrectTupleInput() {
-			Tuple incompleteInputTuple = TupleBuilder.tuple()
-					//	missing data type
-					.put(TF_SHAPE, new long[0])
-					.put(TF_VALUE, new byte[0])
-					.build();
-			testEvaluation(incompleteInputTuple);
-		}
-
-		private void testEvaluation(Object input) {
+		@Override
+		protected void testEvaluation(Object input) {
 
 			Map<String, Object> inMap = new HashMap<>();
 			inMap.put("Placeholder", input);
@@ -234,6 +214,70 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 			assertThat(((Tuple) outputMessage.getPayload()).getFloat("add"), equalTo(0.29999298f));
 
 			assertThat((Tuple) inputMessage.getPayload(), equalTo(inTuple));
+		}
+	}
+
+
+	@TestPropertySource(properties = {
+			"tensorflow.mode=header"
+	})
+	public static class DefaultInputHeaderOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
+
+		@Override
+		protected void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Message<?> inputMessage = MessageBuilder
+					.withPayload(inMap)
+					.setHeader("passthrough", "passthrough")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			assertThat("Original Message Payload must be preserver",
+					(Map<String, Object>) outputMessage.getPayload(), equalTo(inMap));
+
+			assertThat("Inference result must be stored in the header[myheader]",
+					(Float) outputMessage.getHeaders().get("add"), equalTo(0.29999298f));
+
+			assertThat((String) outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
+		}
+	}
+
+	@TestPropertySource(properties = {
+			"tensorflow.mode=tuple",
+			"tensorflow.outputName=myOutputName"
+	})
+	public static class DefaultInputTupleOutputWithName extends LinearRegressionTensorflowProcessorIntegrationTests {
+
+		@Override
+		protected void testEvaluation(Object input) {
+
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
+
+			Message<?> inputMessage = MessageBuilder
+					.withPayload(inMap)
+					.setHeader("passthrough", "passthrough")
+					.build();
+
+			channels.input().send(inputMessage);
+
+			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll();
+
+			Tuple outputPayloadTuple = ((Tuple) outputMessage.getPayload());
+
+			assertThat("Original Message Payload must be preserver in the output Tuple",
+					(Map<String, Object>) outputPayloadTuple.getValue(TensorflowProcessorConfiguration.ORIGINAL_INPUT_DATA),
+					equalTo(inMap));
+
+			assertThat(outputPayloadTuple.getFloat("myOutputName"), equalTo(0.29999298f));
+
+			assertThat((String) outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
 		}
 	}
 
