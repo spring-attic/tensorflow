@@ -52,7 +52,7 @@ import org.springframework.tuple.Tuple;
 				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
-@Ignore
+@Ignore("Exclude the Twitter Sentiment Processor Integration Test until a proper Mock TF Model is provided!")
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 	@Autowired
