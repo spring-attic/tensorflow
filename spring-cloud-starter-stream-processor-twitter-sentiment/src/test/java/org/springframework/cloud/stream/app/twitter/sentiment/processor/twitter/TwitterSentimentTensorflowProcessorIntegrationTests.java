@@ -19,6 +19,7 @@ package org.springframework.cloud.stream.app.twitter.sentiment.processor.twitter
 import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -51,6 +52,7 @@ import org.springframework.tuple.Tuple;
 				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
+@Ignore
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 	@Autowired
