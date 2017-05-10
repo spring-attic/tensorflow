@@ -34,68 +34,59 @@ import org.springframework.validation.annotation.Validated;
 public class TensorflowProcessorProperties {
 
 	/**
-	 * The location of the Tensorflow model file.
+	 * The location of the TensorFlow model file.
 	 */
-	private Resource modelLocation;
+	private Resource model;
 
 	/**
-	 * The graph model output. Name of TensorFlow operation to fetch the output Tensors from.
+	 * The TensorFlow graph model output. Name of TensorFlow operation to fetch the output Tensors from.
 	 */
-	private String modelFetchName;
+	private String modelFetch;
 
 	/**
-	 * Fetched operation (modelFetchName) returns a list of Tensors. The modelFetchIndex specifies which
-	 * Tensor from that list to use as an output.
+	 * The modelFetch returns a list of Tensors. The modelFetchIndex specifies the index in the list to use as an output.
 	 */
 	private int modelFetchIndex = 0;
 
 	/**
-	 * Specifies where to obtain the input data from. When empty defaults to {@link org.springframework.messaging.Message}'s payload.
-	 * To obtain an input from a {@link org.springframework.tuple.Tuple} set:
-	 * 'tensorflow.expression=payload.myInTupleName', where myInTupleName is a Tuple key.
-	 * To obtain input date from a message header use:
-	 * 'tensorflow.expression=headers[myHeaderName]', where is the name of the header that contains the input data.
+	 * How to obtain the input data from the input message. If empty it defaults to the input message payload.
+	 * The payload.myInTupleName expression treats the input payload as a Tuple, and myInTupleName stands for
+	 * a Tuple key. The headers[myHeaderName] expression to get input data from message's header using
+	 * myHeaderName as a key.
 	 */
 	private Expression expression;
 
 	/**
-	 * Specifies how the outbound data is carried and whether the input message is mirrored in the output or discarded.
-	 *
-	 * The {@link OutputMode#payload} mode (default) stores the output data in the outbound message payload. The
-	 * input message payload is discarded.
-	 *
-	 * The {@link OutputMode#header} mode stores the output data in message's header under the
-	 * {@link TensorflowProcessorProperties#outputName} name. The the output message payload mirrors the input payload.
-	 *
-	 * The {@link OutputMode#tuple} mode stores the output data in the payload using a
-	 * {@link org.springframework.tuple.Tuple} structure. The output data is stored under the
-	 * {@link TensorflowProcessorProperties#outputName} key, while the input payload is passed through under the
-	 * {@link TensorflowProcessorConfiguration#ORIGINAL_INPUT_DATA} key.
+	 * Defines how to store the output data and if the input payload is passed through or discarded.
+	 * Payload (Default) stores the output data in the outbound message payload. The input payload is discarded.
+	 * Header stores the output data in outputName message's header. The the input payload is passed through.
+	 * Tuple stores the output data in an Tuple payload, using the outputName key. The input payload is passed through
+	 * in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
+	 * a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.
 	 */
 	private OutputMode mode = OutputMode.payload;
 
 	/**
-	 * Applicable only for the {@link OutputMode#header} and {@link OutputMode#tuple} modes. Sets the output data key
-	 * either in the outbound Header or Tuple. If empty it defaults to the modelFetchName property.
+	 * The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.
 	 */
 	private String outputName;
 
 	@NotNull
-	public String getModelFetchName() {
-		return modelFetchName;
+	public String getModelFetch() {
+		return modelFetch;
 	}
 
-	public void setModelFetchName(String modelFetchName) {
-		this.modelFetchName = modelFetchName;
+	public void setModelFetch(String modelFetch) {
+		this.modelFetch = modelFetch;
 	}
 
 	@NotNull
-	public Resource getModelLocation() {
-		return modelLocation;
+	public Resource getModel() {
+		return model;
 	}
 
-	public void setModelLocation(Resource modelLocation) {
-		this.modelLocation = modelLocation;
+	public void setModel(Resource model) {
+		this.model = model;
 	}
 
 	public int getModelFetchIndex() {
@@ -114,6 +105,7 @@ public class TensorflowProcessorProperties {
 		this.expression = expression;
 	}
 
+	@NotNull
 	public OutputMode getMode() {
 		return mode;
 	}
@@ -123,7 +115,7 @@ public class TensorflowProcessorProperties {
 	}
 
 	public String getOutputName() {
-		return StringUtils.isEmpty(outputName) ? getModelFetchName() : outputName;
+		return StringUtils.isEmpty(outputName) ? getModelFetch() : outputName;
 	}
 
 	public void setOutputName(String outputName) {

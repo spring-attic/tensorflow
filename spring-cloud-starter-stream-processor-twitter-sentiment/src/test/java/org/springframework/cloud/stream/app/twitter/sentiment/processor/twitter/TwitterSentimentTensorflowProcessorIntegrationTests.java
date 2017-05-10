@@ -46,9 +46,9 @@ import org.springframework.tuple.Tuple;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.modelLocation=http://dl.bintray.com/big-data/generic/minimal_graph.proto",
-				"tensorflow.modelFetchName=output/Softmax",
-				"tensorflow.twitter.vocabularyLocation=http://dl.bintray.com/big-data/generic/vocab.csv"
+				"tensorflow.model=http://dl.bintray.com/big-data/generic/minimal_graph.proto",
+				"tensorflow.modelFetch=output/Softmax",
+				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {

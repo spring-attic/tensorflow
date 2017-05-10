@@ -23,7 +23,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Holds configuration properties for the Twitter Sentiment Analysis Processor module.
+ * Configuration properties for the Twitter Sentiment Analysis Processor module.
  *
  * @author Christian Tzolov
  */
@@ -32,17 +32,16 @@ import org.springframework.validation.annotation.Validated;
 public class TwitterSentimentProcessorProperties {
 
 	/**
-	 * The location of the word vocabulary file.
-	 * Note: the vocabulary must be the same used for training the model
+	 * The location of the word vocabulary file, used for training the model
 	 */
-	private Resource vocabularyLocation;
+	private Resource vocabulary;
 
 	@NotNull
-	public Resource getVocabularyLocation() {
-		return vocabularyLocation;
+	public Resource getVocabulary() {
+		return vocabulary;
 	}
 
-	public void setVocabularyLocation(Resource vocabularyLocation) {
-		this.vocabularyLocation = vocabularyLocation;
+	public void setVocabulary(Resource vocabulary) {
+		this.vocabulary = vocabulary;
 	}
 }

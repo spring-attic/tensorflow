@@ -21,7 +21,6 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -33,13 +32,13 @@ import org.springframework.context.annotation.Configuration;
 public class TwitterSentimentProcessorPropertiesTest {
 
 	@Test
-	public void vocabularyLocationCanBeCustomized() {
+	public void vocabularyCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.twitter.vocabularyLocation:/remote");
+		EnvironmentTestUtils.addEnvironment(context, "tensorflow.twitter.vocabulary:/remote");
 		context.register(Conf.class);
 		context.refresh();
 		TwitterSentimentProcessorProperties properties = context.getBean(TwitterSentimentProcessorProperties.class);
-		assertThat(properties.getVocabularyLocation(), equalTo(context.getResource("/remote")));
+		assertThat(properties.getVocabulary(), equalTo(context.getResource("/remote")));
 		context.close();
 	}
 

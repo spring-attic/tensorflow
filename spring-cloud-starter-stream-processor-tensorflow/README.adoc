@@ -34,29 +34,20 @@ tf.train.write_graph(minimal_graph, SAVE_DIR, 'my.txt', as_text=True)
 The **$$tensorflow$$** $$processor$$ has the following options:
 
 //tag::configuration-properties[]
-$$tensorflow.expression$$:: $$Specifies where to obtain the input data from. When empty defaults to {@link org.springframework.messaging.Message}'s payload.
- To obtain an input from a {@link org.springframework.tuple.Tuple} set:
- 'tensorflow.expression=payload.myInTupleName', where myInTupleName is a Tuple key.
- To obtain input date from a message header use:
- 'tensorflow.expression=headers[myHeaderName]', where is the name of the header that contains the input data.$$ *($$Expression$$, default: `$$<none>$$`)*
-$$tensorflow.mode$$:: $$Specifies how the outbound data is carried and whether the input message is mirrored in the output or discarded.
-
- The {@link OutputMode#payload} mode (default) stores the output data in the outbound message payload. The
- input message payload is discarded.
-
- The {@link OutputMode#header} mode stores the output data in message's header under the
- {@link TensorflowProcessorProperties#outputName} name. The the output message payload mirrors the input payload.
-
- The {@link OutputMode#tuple} mode stores the output data in the payload using a
- {@link org.springframework.tuple.Tuple} structure. The output data is stored under the
- {@link TensorflowProcessorProperties#outputName} key, while the input payload is passed through under the
- {@link TensorflowProcessorConfiguration#ORIGINAL_INPUT_DATA} key.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
-$$tensorflow.model-fetch-index$$:: $$Fetched operation (modelFetchName) returns a list of Tensors. The modelFetchIndex specifies which
- Tensor from that list to use as an output.$$ *($$Integer$$, default: `$$0$$`)*
-$$tensorflow.model-fetch-name$$:: $$The graph model output. Name of TensorFlow operation to fetch the output Tensors from.$$ *($$String$$, default: `$$<none>$$`)*
-$$tensorflow.model-location$$:: $$The location of the Tensorflow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
-$$tensorflow.output-name$$:: $$Applicable only for the {@link OutputMode#header} and {@link OutputMode#tuple} modes. Sets the output data key
- either in the outbound Header or Tuple. If empty it defaults to the modelFetchName property.$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.expression$$:: $$How to obtain the input data from the input message. If empty it defaults to the input message payload.
+ The payload.myInTupleName expression treats the input payload as a Tuple, and myInTupleName stands for
+ a Tuple key. The headers[myHeaderName] expression to get input data from message's header using
+ myHeaderName as a key.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$tensorflow.mode$$:: $$Defines how to store the output data and if the input payload is passed through or discarded.
+ Payload (Default) stores the output data in the outbound message payload. The input payload is discarded.
+ Header stores the output data in outputName message's header. The the input payload is passed through.
+ Tuple stores the output data in an Tuple payload, using the outputName key. The input payload is passed through
+ in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
+ a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
+$$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch$$:: $$The TensorFlow graph model output. Name of TensorFlow operation to fetch the output Tensors from.$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch-index$$:: $$The modelFetch returns a list of Tensors. The modelFetchIndex specifies the index in the list to use as an output.$$ *($$Integer$$, default: `$$0$$`)*
+$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.$$ *($$String$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]

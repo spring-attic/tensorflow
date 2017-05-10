@@ -102,7 +102,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 		Map<String, Object> inputDataMap = tensorflowInputConverter.convert(inputData, processorContext);
 
 		Tensor outputTensor = tensorFlowService.evaluate(
-				inputDataMap, properties.getModelFetchName(), properties.getModelFetchIndex());
+				inputDataMap, properties.getModelFetch(), properties.getModelFetchIndex());
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
 
@@ -118,7 +118,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 
 			if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
 				// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
-				// content of the existing tuple in the new tuple to be returned.
+				// content of the input tuple in the new tuple to be returned.
 				outTupleBuilder.putAll((Tuple) payload);
 			}
 			else {
@@ -138,7 +138,7 @@ public class TensorflowProcessorConfiguration implements AutoCloseable {
 	@Bean
 	@RefreshScope
 	public TensorFlowService tensorFlowService() throws IOException {
-		return new TensorFlowService(properties.getModelLocation());
+		return new TensorFlowService(properties.getModel());
 	}
 
 	@Bean

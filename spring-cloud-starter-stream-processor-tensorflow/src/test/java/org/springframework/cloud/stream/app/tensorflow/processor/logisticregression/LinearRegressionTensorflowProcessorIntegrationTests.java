@@ -71,8 +71,8 @@ import org.springframework.tuple.TupleBuilder;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.modelLocation=classpath:tensorflow/model/linear_regression_graph.proto",
-				"tensorflow.modelFetchName=add"
+				"tensorflow.model=classpath:tensorflow/model/linear_regression_graph.proto",
+				"tensorflow.modelFetch=add"
 		}
 )
 @DirtiesContext
