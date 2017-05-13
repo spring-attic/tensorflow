@@ -1,10 +1,31 @@
 //tag::ref-doc[]
 :image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
+:master-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master
 = TensorFlow Processor
 
 A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
 
+Following snippet shows how to export a `TensorFlow` model into `ProtocolBuffer` binary format as required by the Processor.
+```python
+from tensorflow.python.framework.graph_util import convert_variables_to_constants
+...
+SAVE_DIR = os.path.abspath(os.path.curdir)
+minimal_graph = convert_variables_to_constants(sess, sess.graph_def, ['<model output>'])
+tf.train.write_graph(minimal_graph, SAVE_DIR, 'my_graph.proto', as_text=False)
+tf.train.write_graph(minimal_graph, SAVE_DIR, 'my.txt', as_text=True)
+```
+
 image::{image-root}/TensorFlowProcessorArcutectureOverview.png[]
+
+The `--tensorflow.model` property configures the Processor with the location of the serialized Tensorflow model.
+
+The `TensorflowInputConverter` converts the input data into the format, specific for the given model.
+
+The `TensorflowOutputConverter` converts the computed `Tensors` result into a pipeline `Message`.
+
+The `--tensorflow.modelFetch` property defines the list of TensorFlow graph outputs to fetch the output Tensors from.
+
+The `--tensorflow.mode` property defines whether the computed results are passed in the message payload or in the message header.
 
 == Input
 
@@ -19,17 +40,8 @@ TensorFlow Model used. The input converter converts the input `Messages` into ke
 the Key corresponds to a model input placeholder and the content is `org.tensorflow.DataType` compliant value.
 The default converter implementation expects either Map payload or flat json message that can be converted into a Map.
 
-The `TensorflowInputConverter` can be extended and customized. See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowInputConverter.java[TwitterSentimentTensorflowInputConverter.java] for example.
-
-Following snippet shows how to export any `TensorFlow` model (trained as well) into `ProtocolBuffer` binary format as required by the Processor.
-```python
-from tensorflow.python.framework.graph_util import convert_variables_to_constants
-...
-SAVE_DIR = os.path.abspath(os.path.curdir)
-minimal_graph = convert_variables_to_constants(sess, sess.graph_def, ['<model output>'])
-tf.train.write_graph(minimal_graph, SAVE_DIR, 'my_graph.proto', as_text=False)
-tf.train.write_graph(minimal_graph, SAVE_DIR, 'my.txt', as_text=True)
-```
+The `TensorflowInputConverter` can be extended and customized.
+See link::{master-root}/spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowInputConverter.java[TwitterSentimentTensorflowInputConverter.java] for example.
 
 == Output
 
@@ -43,7 +55,7 @@ Processor's output uses `TensorflowOutputConverter` to convert the computed `Ten
 message. The default implementation uses `Tuple` triple.
 
 Custom `TensorflowOutputConverter` can provide more convenient data representations.
-See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java].
+See link::{master-root}/spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java].
 
 == Options
 
@@ -61,9 +73,8 @@ $$tensorflow.mode$$:: $$Defines how to store the output data and if the input pa
  in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
  a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
 $$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
-$$tensorflow.model-fetch$$:: $$The TensorFlow graph model output. Name of TensorFlow operation to fetch the output Tensors from.$$ *($$String$$, default: `$$<none>$$`)*
-$$tensorflow.model-fetch-index$$:: $$The modelFetch returns a list of Tensors. The modelFetchIndex specifies the index in the list to use as an output.$$ *($$Integer$$, default: `$$0$$`)*
-$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes.$$ *($$String$$, default: `$$result$$`)*
 //end::configuration-properties[]
 
 == Build

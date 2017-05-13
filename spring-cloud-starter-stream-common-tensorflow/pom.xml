@@ -12,16 +12,37 @@
         <version>2.0.0.BUILD-SNAPSHOT</version>
     </parent>
 
-
     <dependencies>
         <dependency>
             <groupId>org.tensorflow</groupId>
             <artifactId>tensorflow</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.tensorflow</groupId>
+            <artifactId>proto</artifactId>
+        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.tensorflow</groupId>-->
+            <!--<artifactId>libtensorflow</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.tensorflow</groupId>-->
+            <!--<artifactId>libtensorflow_jni_gpu</artifactId>-->
+        <!--</dependency>-->
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-context</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud.stream.app</groupId>
+            <artifactId>app-starters-postprocessor-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-test-support</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>

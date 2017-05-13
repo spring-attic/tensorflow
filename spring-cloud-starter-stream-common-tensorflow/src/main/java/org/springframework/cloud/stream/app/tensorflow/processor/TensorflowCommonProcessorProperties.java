@@ -16,13 +16,13 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
+import java.util.List;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.expression.Expression;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 /**
  * Holds configuration properties for the TensorFlow Processor module.
@@ -40,14 +40,9 @@ public class TensorflowCommonProcessorProperties {
 	private Resource model;
 
 	/**
-	 * The TensorFlow graph model output. Name of TensorFlow operation to fetch the output Tensors from.
+	 * The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.
 	 */
-	private String modelFetch;
-
-	/**
-	 * The modelFetch returns a list of Tensors. The modelFetchIndex specifies the index in the list to use as an output.
-	 */
-	private int modelFetchIndex = 0;
+	private List<String> modelFetch;
 
 	/**
 	 * How to obtain the input data from the input message. If empty it defaults to the input message payload.
@@ -68,16 +63,15 @@ public class TensorflowCommonProcessorProperties {
 	private OutputMode mode = OutputMode.payload;
 
 	/**
-	 * The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.
+	 * The output data key used in the Header or Tuple modes.
 	 */
-	private String outputName;
+	private String outputName = "result";
 
-	@NotNull
-	public String getModelFetch() {
+	public List<String> getModelFetch() {
 		return this.modelFetch;
 	}
 
-	public void setModelFetch(String modelFetch) {
+	public void setModelFetch(List<String> modelFetch) {
 		this.modelFetch = modelFetch;
 	}
 
@@ -88,14 +82,6 @@ public class TensorflowCommonProcessorProperties {
 
 	public void setModel(Resource model) {
 		this.model = model;
-	}
-
-	public int getModelFetchIndex() {
-		return this.modelFetchIndex;
-	}
-
-	public void setModelFetchIndex(int modelFetchIndex) {
-		this.modelFetchIndex = modelFetchIndex;
 	}
 
 	public Expression getExpression() {
@@ -116,7 +102,7 @@ public class TensorflowCommonProcessorProperties {
 	}
 
 	public String getOutputName() {
-		return StringUtils.isEmpty(this.outputName) ? getModelFetch() : this.outputName;
+		return this.outputName;
 	}
 
 	public void setOutputName(String outputName) {

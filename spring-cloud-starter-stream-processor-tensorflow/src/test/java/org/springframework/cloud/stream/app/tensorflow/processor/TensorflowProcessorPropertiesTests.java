@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.stream.config.SpelExpressionConverterConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -42,18 +43,17 @@ public class TensorflowProcessorPropertiesTests {
 	@Before
 	public void beforeTest() {
 		context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.model:NONE");
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetch:NONE");
+		TestPropertyValues.of("tensorflow.model:NONE").and("tensorflow.modelFetch:NONE").applyTo(context);
 	}
 
 	@After
-	public void asfterTest() {
+	public void afterTest() {
 		context.close();
 	}
 
 	@Test
 	public void modelCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.model:/remote");
+		TestPropertyValues.of("tensorflow.model:/remote").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
@@ -62,20 +62,12 @@ public class TensorflowProcessorPropertiesTests {
 
 	@Test
 	public void modelFetchCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetch:output1");
+		TestPropertyValues.of("tensorflow.modelFetch:output1").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
-		assertThat(properties.getModelFetch(), equalTo("output1"));
-	}
-
-	@Test
-	public void modelFetchIndexCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetchIndex:666");
-		context.register(Conf.class);
-		context.refresh();
-		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
-		assertThat(properties.getModelFetchIndex(), equalTo(666));
+		assertThat(properties.getModelFetch().size(), equalTo(1));
+		assertThat(properties.getModelFetch().iterator().next(), equalTo("output1"));
 	}
 
 	@Test
@@ -88,7 +80,7 @@ public class TensorflowProcessorPropertiesTests {
 
 	@Test
 	public void modeCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.mode:header");
+		TestPropertyValues.of("tensorflow.mode:header").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
@@ -96,17 +88,16 @@ public class TensorflowProcessorPropertiesTests {
 	}
 
 	@Test
-	public void emptyOutputNameDefaultsTomodelFetch() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetch:output1");
+	public void defaultOutputName() {
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
-		assertThat(properties.getOutputName(), equalTo("output1"));
+		assertThat(properties.getOutputName(), equalTo("result"));
 	}
 
 	@Test
 	public void outputNameCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.outputName:outputName2");
+		TestPropertyValues.of("tensorflow.outputName:outputName2").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
@@ -123,7 +114,7 @@ public class TensorflowProcessorPropertiesTests {
 
 	@Test
 	public void expressionCanBeCustomized() {
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.expression:header");
+		TestPropertyValues.of("tensorflow.expression:header").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);

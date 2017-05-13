@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.app.twitter.sentiment.processor.twitter;
 
-import static org.hamcrest.Matchers.equalTo;
-
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -38,6 +36,8 @@ import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.hamcrest.Matchers.equalTo;
+
 /**
  * Integration Tests for TwitterSentimentTensorflowProcessor
  *
@@ -53,7 +53,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
-@Ignore("Exclude the Twitter Sentiment Processor Integration Test until a proper Mock TF Model is provided!")
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 	@Autowired
@@ -62,6 +61,7 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
+	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	public static class OutputInPayloadTests extends TwitterSentimentTensorflowProcessorIntegrationTests {
 
 		@Test
@@ -83,7 +83,7 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 			Message<?> received = messageCollector.forChannel(channels.output()).poll(10, TimeUnit.SECONDS);
 
-			Assert.assertThat((String) received.getPayload(), equalTo(resultJson));
+			Assert.assertThat(received.getPayload(), equalTo(resultJson));
 		}
 	}
 
