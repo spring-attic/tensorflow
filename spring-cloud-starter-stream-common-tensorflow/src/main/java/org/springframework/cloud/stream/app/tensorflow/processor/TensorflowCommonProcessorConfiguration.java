@@ -16,28 +16,38 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.tensorflow.Tensor;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.cloud.stream.annotation.StreamListener;
+import org.springframework.cloud.stream.annotation.StreamMessageConverter;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.converter.AbstractMessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
+import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.tuple.JsonBytesToTupleConverter;
 import org.springframework.tuple.Tuple;
 import org.springframework.tuple.TupleBuilder;
-import org.tensorflow.Tensor;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.util.MimeType;
+import org.springframework.util.MimeTypeUtils;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -88,7 +98,8 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 	@Autowired
 	private TensorFlowService tensorFlowService;
 
-	@ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
+	@StreamListener(Processor.INPUT)
+	@SendTo(Processor.OUTPUT)
 	public Object evaluate(Message<?> input) {
 
 		Object inputData =
@@ -101,37 +112,53 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 
 		Map<String, Object> inputDataMap = this.tensorflowInputConverter.convert(inputData, processorContext);
 
-		Tensor outputTensor = this.tensorFlowService.evaluate(inputDataMap, this.properties.getModelFetch(),
-				this.properties.getModelFetchIndex());
+		Map<String, Tensor<?>> outputTensorMap = this.tensorFlowService.evaluate(inputDataMap, this.properties.getModelFetch());
 
-		Object outputData = tensorflowOutputConverter.convert(outputTensor, processorContext);
+		Object outputData = tensorflowOutputConverter.convert(outputTensorMap, processorContext);
 
 		switch (this.properties.getMode()) {
 
-			case tuple:
-				TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
+		case tuple:
+			TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
 
-				Object payload = input.getPayload();
+			Object payload = input.getPayload();
 
-				if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
-					// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
-					// content of the input tuple in the new tuple to be returned.
-					outTupleBuilder.putAll((Tuple) payload);
-				}
-				else {
-					// This is a new tuple so preserve the input data.
-					outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
-				}
+			if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
+				// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
+				// content of the input tuple in the new tuple to be returned.
+				outTupleBuilder.putAll((Tuple) payload);
+			}
+			else {
+				// This is a new tuple so preserve the input data.
+				outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
+			}
 
-				return outTupleBuilder.build();
+			return MessageBuilder
+					.withPayload(outTupleBuilder.build())
+					.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple");
 
-			case header:
-				return MessageBuilder
-						.withPayload(input.getPayload())
-						.setHeader(this.properties.getOutputName(), outputData);
+		case header:
+			MessageBuilder<?> builder = MessageBuilder
+					.withPayload(input.getPayload())
+					.setHeader(this.properties.getOutputName(), outputData);
+			if (input.getHeaders().get(MessageHeaders.CONTENT_TYPE) != null) {
+				builder.setHeader(MessageHeaders.CONTENT_TYPE, input.getHeaders().get(MessageHeaders.CONTENT_TYPE));
+			}
+			return builder;
 
-			default:
-				return outputData;
+		default:
+			builder = MessageBuilder
+					.withPayload(outputData);
+			if (outputData instanceof Tuple) {
+				builder.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple");
+				return builder;
+			} else if (outputData instanceof String) {
+				builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
+				return builder;
+			}
+
+			builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
+			return builder;
 		}
 
 	}
@@ -146,12 +173,9 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 	@ConditionalOnMissingBean(name = "tensorflowOutputConverter")
 	public TensorflowOutputConverter tensorflowOutputConverter() {
 		// Default implementations serializes the Tensor into Tuple
-		return new TensorflowOutputConverter<Tuple>() {
-
-			@Override
-			public Tuple convert(Tensor tensor, Map<String, Object> processorContext) {
-				return TensorTupleConverter.toTuple(tensor);
-			}
+		return (TensorflowOutputConverter<Tuple>) (tensorMap, processorContext) -> {
+			Tensor<?> tensor = tensorMap.entrySet().iterator().next().getValue();
+			return TensorTupleConverter.toTuple(tensor);
 		};
 	}
 
@@ -159,16 +183,40 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 	@ConditionalOnMissingBean(name = "tensorflowInputConverter")
 	@SuppressWarnings("unchecked")
 	public TensorflowInputConverter tensorflowInputConverter() {
-		return new TensorflowInputConverter() {
+		return (input, processorContext) -> {
+
+			if (input instanceof Map) {
+				return (Map<String, Object>) input;
+			} else if (input instanceof Tuple) {
+				Tuple tuple = (Tuple) input;
+				Map<String, Object> map = new LinkedHashMap<>(tuple.size());
+				for (int i = 0; i < tuple.size(); i++) {
+					map.put(tuple.getFieldNames().get(i), tuple.getValue(i));
+				}
+				return map;
+			}
+
+			throw new MessageConversionException("Unsupported input format: " + input);
+		};
+	}
+
+	@Bean
+	@StreamMessageConverter
+	public MessageConverter toTensorMessageConverter() {
+		return new AbstractMessageConverter(new MimeType("application", "x-tensor")) {
+			@Override
+			protected boolean supports(Class<?> clazz) {
+				return Tensor.class.equals(clazz);
+			}
 
 			@Override
-			public Map<String, Object> convert(Object input, Map<String, Object> processorContext) {
-
-				if (input instanceof Map) {
-					return (Map<String, Object>) input;
+			protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
+				Object payload = message.getPayload();
+				if (payload instanceof Tensor) {
+					return payload;
 				}
-
-				throw new MessageConversionException("Unsupported input format: " + input);
+				Tuple tuple = new JsonBytesToTupleConverter().convert((byte[]) payload);
+				return TensorTupleConverter.toTensor(tuple);
 			}
 		};
 	}

@@ -22,12 +22,12 @@ import org.tensorflow.Tensor;
 import java.util.Map;
 
 /**
- * The TensorFlow evaluation result is represented by a (non-serializable) {@link Tensor} instance.
+ * The TensorFlow evaluation result is represented by a list of (non-serializable) {@link Tensor} instances.
  *
- * Implementations of this interface are responsible to convert the {@link Tensor} instance into a serializable type
- * that can be send as a Message.
+ * Implementations of this interface are responsible to convert the result {@link Tensor} instances into
+ * a serializable type that can be send as a Message.
  *
- * The default implementation coverts the {@link Tensor} into {@link Tuple} with 3 elements:
+ * The default implementation coverts the the {@link Tensor}s into {@link Tuple}. Each tensor is encoded as:
  *
  * <li>
  *     	"type"  : TensorFlow {@link org.tensorflow.DataType} name
@@ -46,10 +46,10 @@ import java.util.Map;
 public interface TensorflowOutputConverter<T> {
 	/**
 	 *
-	 * @param tensor {@link Tensor} result of the model evaluation.
+	 * @param resultTensors map of named {@link Tensor} results of the model evaluation.
 	 * @param processorContext processorContext Context used to share information between the Input and Output converters
 	 * @return Returns the converted {@link Tensor} data.
 	 */
-	T convert(Tensor tensor, Map<String, Object> processorContext);
+	T convert(Map<String, Tensor<?>> resultTensors, Map<String, Object> processorContext);
 
 }

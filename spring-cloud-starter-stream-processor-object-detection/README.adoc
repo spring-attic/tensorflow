@@ -1,0 +1,62 @@
+//tag::ref-doc[]
+= Object Detection Processor
+
+
+A processor that uses the https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] for localizing and identifying multiple objects in a single image.
+It can use one of the pre-trained https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md[object detection models] and categorization https://github.com/tensorflow/models/tree/865c14c/research/object_detection/data[labels].
+
+The input of the processor is an image as binary array. The output is a Tuple (or JSON) message in this format:
+
+```json
+{
+  "labels" : [
+     {"person":0.9996774,"x1":0.0,"y1":0.3940161,"x2":0.9465165,"y2":0.5592592},
+     {"person":0.9996604,"x1":0.047891676,"y1":0.03169123,"x2":0.941098,"y2":0.2085562},
+     {"backpack":0.96534747,"x1":0.15588468,"y1":0.85957795,"x2":0.5091308,"y2":0.9908878},
+     {"backpack":0.963343,"x1":0.1273736,"y1":0.57658505,"x2":0.47765,"y2":0.6986431}
+  ]
+}
+
+```
+Response format looks like this:
+
+```
+"object-name":confidence float[0-1],
+"x1": float[0-1], "y1": float[0-1],
+"x2": float[0-1], "y2":float[0-1]
+```
+
+It contains the name of the recognized category (e.g. label) along with the confidence (e.g. confidence) that the image contains this category.
+Response also provides the bounding box of the detected objects represented as (x1, y1, x2, y2). The coordinates are relative to the size of the image.
+
+
+== Options
+
+The **$$object-detection$$** $$processor$$ has the following options:
+
+//tag::configuration-properties[]
+$$tensorflow.expression$$:: $$How to obtain the input data from the input message. If empty it defaults to the input message payload.
+ The payload.myInTupleName expression treats the input payload as a Tuple, and myInTupleName stands for
+ a Tuple key. The headers[myHeaderName] expression to get input data from message's header using
+ myHeaderName as a key.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$tensorflow.mode$$:: $$Defines how to store the output data and if the input payload is passed through or discarded.
+ Payload (Default) stores the output data in the outbound message payload. The input payload is discarded.
+ Header stores the output data in outputName message's header. The the input payload is passed through.
+ Tuple stores the output data in an Tuple payload, using the outputName key. The input payload is passed through
+ in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
+ a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
+$$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$tensorflow.object.detection.confidence$$:: $$Probability threshold. Only objects detected with probability higher then
+ the confidence threshold are accepted. Value is between 0 and 1.$$ *($$Float$$, default: `$$0.4$$`)*
+$$tensorflow.object.detection.labels$$:: $$The text file containing the category names (e.g. labels) of all categories
+ that this model is trained to recognize. Every category is on a separate line.$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes.$$ *($$String$$, default: `$$result$$`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+== Build
+
+```
+$> mvn package
+```

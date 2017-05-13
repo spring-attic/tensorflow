@@ -61,9 +61,8 @@ $$tensorflow.mode$$:: $$Defines how to store the output data and if the input pa
  in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
  a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
 $$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
-$$tensorflow.model-fetch$$:: $$The TensorFlow graph model output. Name of TensorFlow operation to fetch the output Tensors from.$$ *($$String$$, default: `$$<none>$$`)*
-$$tensorflow.model-fetch-index$$:: $$The modelFetch returns a list of Tensors. The modelFetchIndex specifies the index in the list to use as an output.$$ *($$Integer$$, default: `$$0$$`)*
-$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.$$ *($$String$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes.$$ *($$String$$, default: `$$result$$`)*
 //end::configuration-properties[]
 
 == Build

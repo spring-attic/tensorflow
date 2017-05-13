@@ -52,7 +52,8 @@ public class TwitterSentimentTensorflowOutputConverter implements TensorflowOutp
 	private ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
-	public String convert(Tensor tensor, Map<String, Object> processorContext) {
+	public String convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
+		Tensor tensor = tensorMap.entrySet().iterator().next().getValue();
 		// Read Tensor's value into float[][] matrix
 		float[][] resultMatrix = new float[12][2];
 		tensor.copyTo(resultMatrix);
