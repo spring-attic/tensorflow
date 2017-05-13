@@ -19,6 +19,7 @@
 		<module>tensorflow-app-dependencies</module>
 		<module>tensorflow-app-starters-test-support</module>
 		<module>spring-cloud-starter-stream-processor-twitter-sentiment</module>
+		<module>spring-cloud-starter-stream-processor-image-recognition</module>
 	</modules>
 
 	<dependencyManagement>
