@@ -8,6 +8,38 @@ image::src/test/resources/SCDF_TF_Sentiment.png[]
 
 link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
 
+== Input
+
+=== Headers
+
+* `content-type: application/json`
+
+=== Payload
+
+* `JSON tweet message`
+
+== Output
+
+=== Headers
+
+* `content-type: application/json`
+
+=== Payload
+
+Decodes the evaluated result into POSITIVE, NEGATIVE and NEUTRAL values.
+Then creates and returns a simple JSON message with this structure:
+
+N/A
+
+=== Payload
+
+Processor's output uses `TensorflowOutputConverter` to convert the computed `Tensor` result into a serializable
+message. The default implementation uses `Tuple` triple.
+
+Custom `TensorflowOutputConverter` can provide more convenient data representations.
+See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java].
+
+
 == Options
 
 The **$$twitter-sentiment$$** $$processor$$ has the following options:
@@ -34,5 +66,18 @@ $$tensorflow.twitter.vocabulary$$:: $$The location of the word vocabulary file, 
 == Build
 
 ```
-$> mvn package
+$ ./mvnw clean install -PgenerateApps
+$ cd apps
+```
+You can find the corresponding binder based projects here.
+You can then cd into one of the folders and build it:
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar twitter-sentiment-processor.jar --tensorflow.twitter.vocabulary= --tensorflow.model= \
+    --tensorflow.modelFetch= --tensorflow.mode="
 ```
