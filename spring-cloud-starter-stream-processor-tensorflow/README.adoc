@@ -5,19 +5,20 @@ A processor that evaluates a machine learning model stored in TensorFlow Protobu
 
 image::src/test/resources/TensorFlowProcessorArcutectureOverview.png[]
 
+== Input
+
+=== Headers
+
+N/A
+
+=== Payload
+
 The TensorFlow Processor uses a `TensorflowInputConverter` to convert the input data into data format compliant with the
 TensorFlow Model used. The input converter converts the input `Messages` into key/value `Map`, where
 the Key corresponds to a model input placeholder and the content is `org.tensorflow.DataType` compliant value.
 The default converter implementation expects either Map payload or flat json message that can be converted into a Map.
 
 The `TensorflowInputConverter` can be extended and customized. See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowInputConverter.java[TwitterSentimentTensorflowInputConverter.java] for example.
-
-Processor's output uses `TensorflowOutputConverter` to convert the computed `Tensor` result into a serializable
-message. The default implementation uses `Tuple` triple.
-
-Custom `TensorflowOutputConverter` can provide more convenient data representations.
-See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java].
-
 
 Following snippet shows how to export any `TensorFlow` model (trained as well) into `ProtocolBuffer` binary format as required by the Processor.
 ```python
@@ -28,6 +29,20 @@ minimal_graph = convert_variables_to_constants(sess, sess.graph_def, ['<model ou
 tf.train.write_graph(minimal_graph, SAVE_DIR, 'my_graph.proto', as_text=False)
 tf.train.write_graph(minimal_graph, SAVE_DIR, 'my.txt', as_text=True)
 ```
+
+== Output
+
+=== Headers
+
+N/A
+
+=== Payload
+
+Processor's output uses `TensorflowOutputConverter` to convert the computed `Tensor` result into a serializable
+message. The default implementation uses `Tuple` triple.
+
+Custom `TensorflowOutputConverter` can provide more convenient data representations.
+See link::../spring-cloud-starter-stream-processor-twitter-sentiment/src/main/java/org/springframework/cloud/stream/app/twitter/sentiment/processor/TwitterSentimentTensorflowOutputConverter.java[TwitterSentimentTensorflowOutputConverter.java].
 
 == Options
 
@@ -54,5 +69,17 @@ $$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple m
 == Build
 
 ```
-$> mvn package
+$ ./mvnw clean install -PgenerateApps
+$ cd apps
+```
+You can find the corresponding binder based projects here.
+You can then cd into one of the folders and build it:
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar tensorflow-processor.jar --model= --modelFetch= --mode="
 ```
