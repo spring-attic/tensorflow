@@ -62,7 +62,6 @@ $$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple m
 $$tensorflow.twitter.vocabulary$$:: $$The location of the word vocabulary file, used for training the model$$ *($$Resource$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 
-//end::ref-doc[]
 == Build
 
 ```
@@ -81,3 +80,4 @@ $ ./mvnw clean package
 java -jar twitter-sentiment-processor.jar --tensorflow.twitter.vocabulary= --tensorflow.model= \
     --tensorflow.modelFetch= --tensorflow.mode="
 ```
+//end::ref-doc[]
