@@ -65,7 +65,6 @@ $$tensorflow.model-fetch-index$$:: $$The modelFetch returns a list of Tensors. T
 $$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes. Empty name defaults to the modelFetch property value.$$ *($$String$$, default: `$$<none>$$`)*
 //end::configuration-properties[]
 
-//end::ref-doc[]
 == Build
 
 ```
@@ -83,3 +82,4 @@ $ ./mvnw clean package
 ```
 java -jar tensorflow-processor.jar --model= --modelFetch= --mode="
 ```
+//end::ref-doc[]
