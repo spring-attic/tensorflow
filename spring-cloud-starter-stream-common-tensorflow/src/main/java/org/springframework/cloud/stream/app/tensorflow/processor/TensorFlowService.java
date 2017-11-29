@@ -16,28 +16,27 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.tuple.Tuple;
+import org.springframework.util.StreamUtils;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Session.Runner;
 import org.tensorflow.Tensor;
 
-import org.springframework.core.io.Resource;
-import org.springframework.tuple.Tuple;
-import org.springframework.util.StreamUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Christian Tzolov
  */
 public class TensorFlowService implements AutoCloseable {
 
-	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
+	private static final Log logger = LogFactory.getLog(TensorflowCommonProcessorConfiguration.class);
 
 	private Graph graph;
 

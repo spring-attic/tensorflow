@@ -28,8 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.tensorflow.Tensor;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -49,6 +47,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.tuple.Tuple;
 import org.springframework.tuple.TupleBuilder;
+import org.tensorflow.Tensor;
 
 /**
  * Integration Tests for TensorflowProcessor.

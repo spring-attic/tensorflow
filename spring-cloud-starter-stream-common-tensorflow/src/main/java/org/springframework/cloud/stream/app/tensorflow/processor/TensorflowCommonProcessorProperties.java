@@ -16,13 +16,13 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.expression.Expression;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Holds configuration properties for the TensorFlow Processor module.
@@ -32,7 +32,7 @@ import org.springframework.validation.annotation.Validated;
  */
 @ConfigurationProperties("tensorflow")
 @Validated
-public class TensorflowProcessorProperties {
+public class TensorflowCommonProcessorProperties {
 
 	/**
 	 * The location of the TensorFlow model file.

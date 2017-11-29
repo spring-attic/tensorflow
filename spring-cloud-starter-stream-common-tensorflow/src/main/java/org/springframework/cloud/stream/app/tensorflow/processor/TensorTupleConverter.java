@@ -16,13 +16,12 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.nio.ByteBuffer;
-
+import org.springframework.tuple.Tuple;
+import org.springframework.tuple.TupleBuilder;
 import org.tensorflow.DataType;
 import org.tensorflow.Tensor;
 
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
+import java.nio.ByteBuffer;
 
 /**
  * Utility that helps to covert {@link Tensor} to {@link Tuple} and in reverse.
