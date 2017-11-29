@@ -1,10 +1,12 @@
 //tag::ref-doc[]
+:image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
+
 = Twitter Sentiment Analysis Processor
 
 A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
 It operationalizes the https://github.com/danielegrattarola/twitter-sentiment-cnn
 
-image::src/test/resources/SCDF_TF_Sentiment.png[]
+image::{image-root}/SCDF_TF_Sentiment.png[]
 
 link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
 
