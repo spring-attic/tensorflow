@@ -1,3 +1,4 @@
+:image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
 # Spring Cloud Stream TensorFlow Processor
 
 A processor that evaluates a machine learning models built with link:https://www.tensorflow.org/[TensorFlow] and stored
@@ -16,5 +17,5 @@ include::spring-cloud-starter-stream-processor-twitter-sentiment/README.adoc[]
 
 
 ---
-image::tensorflow-app-starters-test-support/src/main/resources/doc/VideoIcon.png[]
+image::{image-root}/VideoIcon.png[]
 Video Tutorial: link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]

@@ -56,7 +56,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.model:/remote");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getModel(), equalTo(context.getResource("/remote")));
 	}
 
@@ -65,7 +65,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetch:output1");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getModelFetch(), equalTo("output1"));
 	}
 
@@ -74,7 +74,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetchIndex:666");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getModelFetchIndex(), equalTo(666));
 	}
 
@@ -82,7 +82,7 @@ public class TensorflowProcessorPropertiesTests {
 	public void modeDefaultsToPayload() {
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getMode(), equalTo(OutputMode.payload));
 	}
 
@@ -91,7 +91,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.mode:header");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getMode(), equalTo(OutputMode.header));
 	}
 
@@ -100,7 +100,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.modelFetch:output1");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getOutputName(), equalTo("output1"));
 	}
 
@@ -109,7 +109,7 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.outputName:outputName2");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getOutputName(), equalTo("outputName2"));
 	}
 
@@ -117,7 +117,7 @@ public class TensorflowProcessorPropertiesTests {
 	public void expressionDefaultsToNull() {
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertNull(properties.getExpression());
 	}
 
@@ -126,12 +126,12 @@ public class TensorflowProcessorPropertiesTests {
 		EnvironmentTestUtils.addEnvironment(context, "tensorflow.expression:header");
 		context.register(Conf.class);
 		context.refresh();
-		TensorflowProcessorProperties properties = context.getBean(TensorflowProcessorProperties.class);
+		TensorflowCommonProcessorProperties properties = context.getBean(TensorflowCommonProcessorProperties.class);
 		assertThat(properties.getExpression().getExpressionString(), equalTo("header"));
 	}
 
 	@Configuration
-	@EnableConfigurationProperties(TensorflowProcessorProperties.class)
+	@EnableConfigurationProperties(TensorflowCommonProcessorProperties.class)
 	@Import(SpelExpressionConverterConfiguration.class)
 	static class Conf {
 
