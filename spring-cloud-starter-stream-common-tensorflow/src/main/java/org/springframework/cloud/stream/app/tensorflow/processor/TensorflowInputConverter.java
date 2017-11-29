@@ -16,9 +16,9 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.util.Map;
-
 import org.springframework.messaging.Message;
+
+import java.util.Map;
 
 /**
  * The {@link TensorflowInputConverter} is called by the TensorFlow Processor to convert the incoming {@link Message}s

@@ -1,10 +1,12 @@
 //tag::ref-doc[]
+:image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
+
 = Twitter Sentiment Analysis Processor
 
 A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
 It operationalizes the https://github.com/danielegrattarola/twitter-sentiment-cnn
 
-image::src/test/resources/SCDF_TF_Sentiment.png[]
+image::{image-root}/SCDF_TF_Sentiment.png[]
 
 link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
 
@@ -79,5 +81,17 @@ $ ./mvnw clean package
 ```
 java -jar twitter-sentiment-processor.jar --tensorflow.twitter.vocabulary= --tensorflow.model= \
     --tensorflow.modelFetch= --tensorflow.mode="
+```
+
+And here is a sample pipeline that computes sentiments for json tweets coming from the `twitterstream` source and
+using the pre-build `minimal_graph.proto` and `vocab.csv`:
+
+```
+tweets=twitterstream --access-token-secret=xxx --access-token=xxx --consumer-secret=xxx --consumer-key=xxx \
+| filter --expression=#jsonPath(payload,'$.lang')=='en' \
+| twitter-sentimet --vocabulary='http://dl.bintray.com/big-data/generic/vocab.csv' \
+   --output-name=output/Softmax --model='http://dl.bintray.com/big-data/generic/minimal_graph.proto' \
+   --model-fetch=output/Softmax \
+| log
 ```
 //end::ref-doc[]

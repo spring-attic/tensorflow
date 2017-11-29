@@ -25,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
-import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowProcessorConfiguration;
-import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowProcessorProperties;
+import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -40,8 +40,8 @@ import org.springframework.context.annotation.Import;
  */
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties({
-		TwitterSentimentProcessorProperties.class, TensorflowProcessorProperties.class})
-@Import(TensorflowProcessorConfiguration.class)
+		TwitterSentimentProcessorProperties.class, TensorflowCommonProcessorProperties.class})
+@Import(TensorflowCommonProcessorConfiguration.class)
 public class TwitterSentimentProcessorConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterSentimentProcessorConfiguration.class);

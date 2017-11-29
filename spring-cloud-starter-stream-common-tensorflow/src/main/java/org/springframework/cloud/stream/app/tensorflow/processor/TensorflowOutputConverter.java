@@ -16,11 +16,10 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.util.Map;
-
+import org.springframework.tuple.Tuple;
 import org.tensorflow.Tensor;
 
-import org.springframework.tuple.Tuple;
+import java.util.Map;
 
 /**
  * The TensorFlow evaluation result is represented by a (non-serializable) {@link Tensor} instance.
@@ -28,7 +27,7 @@ import org.springframework.tuple.Tuple;
  * Implementations of this interface are responsible to convert the {@link Tensor} instance into a serializable type
  * that can be send as a Message.
  *
- * The default implementation coverts the {@link Tensor} into {@link org.springframework.tuple.Tuple} with 3 elements:
+ * The default implementation coverts the {@link Tensor} into {@link Tuple} with 3 elements:
  *
  * <li>
  *     	"type"  : TensorFlow {@link org.tensorflow.DataType} name

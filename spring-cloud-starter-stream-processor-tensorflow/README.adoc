@@ -1,9 +1,10 @@
 //tag::ref-doc[]
+:image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
 = TensorFlow Processor
 
 A processor that evaluates a machine learning model stored in TensorFlow Protobuf format.
 
-image::src/test/resources/TensorFlowProcessorArcutectureOverview.png[]
+image::{image-root}/TensorFlowProcessorArcutectureOverview.png[]
 
 == Input
 
