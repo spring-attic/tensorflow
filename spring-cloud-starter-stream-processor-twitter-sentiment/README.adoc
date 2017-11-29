@@ -82,4 +82,16 @@ $ ./mvnw clean package
 java -jar twitter-sentiment-processor.jar --tensorflow.twitter.vocabulary= --tensorflow.model= \
     --tensorflow.modelFetch= --tensorflow.mode="
 ```
+
+And here is a sample pipeline that computes sentiments for json tweets coming from the `twitterstream` source and
+using the pre-build `minimal_graph.proto` and `vocab.csv`:
+
+```
+tweets=twitterstream --access-token-secret=xxx --access-token=xxx --consumer-secret=xxx --consumer-key=xxx \
+| filter --expression=#jsonPath(payload,'$.lang')=='en' \
+| twitter-sentimet --vocabulary='http://dl.bintray.com/big-data/generic/vocab.csv' \
+   --output-name=output/Softmax --model='http://dl.bintray.com/big-data/generic/minimal_graph.proto' \
+   --model-fetch=output/Softmax \
+| log
+```
 //end::ref-doc[]
