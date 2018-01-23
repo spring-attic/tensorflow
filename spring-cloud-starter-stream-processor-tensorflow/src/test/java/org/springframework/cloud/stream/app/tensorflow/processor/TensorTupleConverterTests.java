@@ -43,7 +43,7 @@ public class TensorTupleConverterTests {
 		Tensor outTensor = TensorTupleConverter.toTensor(tuple);
 
 		long[][] outLongArray = new long[2][2];
-		outLongArray = outTensor.copyTo(outLongArray);
+		outLongArray = (long[][]) outTensor.copyTo(outLongArray);
 
 		compareTensors(inTensor, outTensor);
 		assertArrayEquals(inLongArray, outLongArray);
