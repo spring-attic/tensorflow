@@ -16,12 +16,16 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.tensorflow.DataType;
 import org.tensorflow.Tensor;
+import org.tensorflow.types.UInt8;
 
-import java.nio.ByteBuffer;
+import org.springframework.tuple.Tuple;
+import org.springframework.tuple.TupleBuilder;
 
 /**
  * Utility that helps to covert {@link Tensor} to {@link Tuple} and in reverse.
@@ -57,7 +61,27 @@ public class TensorTupleConverter {
 		long[] shape = (long[]) tuple.getValue(TF_SHAPE);
 		byte[] bytes = (byte[]) tuple.getValue(TF_VALUE);
 
-		return Tensor.create(dataType, shape, ByteBuffer.wrap(bytes));
+		return Tensor.create(dataTypeToClass(dataType), shape, ByteBuffer.wrap(bytes));
+	}
+
+	private static final Map<DataType, Class<?>> typeToClassMap = new HashMap<>();
+
+	static {
+		typeToClassMap.put(DataType.FLOAT, Float.class);
+		typeToClassMap.put(DataType.DOUBLE, Double.class);
+		typeToClassMap.put(DataType.INT32, Integer.class);
+		typeToClassMap.put(DataType.UINT8, UInt8.class);
+		typeToClassMap.put(DataType.INT64, Long.class);
+		typeToClassMap.put(DataType.BOOL, Boolean.class);
+		typeToClassMap.put(DataType.STRING, String.class);
+	}
+
+	private static Class<?> dataTypeToClass(DataType dataType) {
+		Class<?> clazz = typeToClassMap.get(dataType);
+		if (clazz == null) {
+			throw new IllegalArgumentException("No class found for dataType: " + dataType);
+		}
+		return clazz;
 	}
 
 }
