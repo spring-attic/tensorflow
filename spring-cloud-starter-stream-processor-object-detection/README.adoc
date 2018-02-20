@@ -1,6 +1,6 @@
 //tag::ref-doc[]
-= Object Detection Processor
 
+= Object Detection Processor
 
 A processor that uses the https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] for localizing and identifying multiple objects in a single image.
 It can use one of the pre-trained https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md[object detection models] and categorization https://github.com/tensorflow/models/tree/865c14c/research/object_detection/data[labels].
@@ -26,7 +26,7 @@ Response format looks like this:
 "x2": float[0-1], "y2":float[0-1]
 ```
 
-It contains the name of the recognized category (e.g. label) along with the confidence (e.g. confidence) that the image contains this category.
+Response contains the name of the recognized category (e.g. label) along with the confidence (e.g. confidence) that the image contains this category.
 Response also provides the bounding box of the detected objects represented as (x1, y1, x2, y2). The coordinates are relative to the size of the image.
 
 

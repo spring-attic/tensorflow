@@ -32,6 +32,15 @@ include::spring-cloud-starter-stream-processor-image-recognition/README.adoc[]
 
 Video tutorial : link:https://www.youtube.com/watch?v=bvDM7_CKQjo[Real-time image recognition]
 
+---
+
+*Object Detection Processor*  - Based on https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] processor for localizing and identifying multiple objects in a single image.
+include::spring-cloud-starter-stream-processor-object-detection/README.adoc[]
+
+---
+
+
+
 # ATTENTION!
 
 Do not attempt to use/build from `master`; the `master` branch is currently undergoing redesign to adapt to Spring Boot and Spring Cloud 2.0 stack. You'd notice discrepencies and/or test failures.
