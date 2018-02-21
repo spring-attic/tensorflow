@@ -23,11 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.protobuf.TextFormat;
-import object_detection.protos.StringIntLabelMapOuterClass;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tensorflow.Tensor;
 
+import org.springframework.cloud.stream.app.object.detection.protos.StringIntLabelMapOuterClass;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
 import org.springframework.core.io.Resource;
 import org.springframework.tuple.Tuple;

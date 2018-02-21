@@ -16,12 +16,18 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud.stream.app</groupId>
-			<artifactId>tensorflow-app-starters-test-support</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-cloud-starter-stream-common-tensorflow</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>3.5.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud.stream.app</groupId>
-			<artifactId>spring-cloud-starter-stream-common-tensorflow</artifactId>
+			<artifactId>tensorflow-app-starters-test-support</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -48,7 +54,46 @@
 					</generatedApps>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<tasks>
+								<mkdir dir="target/generated-sources/proto"/>
+								<exec executable="protoc">
+									<arg value="--java_out=target/generated-sources/proto"/>
+									<arg value="src/main/proto/string_int_label_map.proto"/>
+								</exec>
+							</tasks>
+							<sourceRoot>target/generated-sources</sourceRoot>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/proto/</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
 </project>
