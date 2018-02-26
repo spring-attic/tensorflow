@@ -7,6 +7,7 @@ package org.springframework.cloud.stream.app.object.detection.protos;
 
 message StringIntLabelMapItem {
   // String name. The most common practice is to set this to a MID or synsets id.
+  // Synset: a set of synonyms that share a common meaning. https://en.wikipedia.org/wiki/WordNet
   optional string name = 1;
 
   // Integer id that maps to the string name above. Label ids should start from 1.

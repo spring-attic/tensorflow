@@ -36,18 +36,14 @@ import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.integration.context.IntegrationContextUtils;
-import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.converter.AbstractMessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.tuple.JsonBytesToTupleConverter;
 import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
 import org.springframework.util.MimeType;
-import org.springframework.util.MimeTypeUtils;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -66,17 +62,13 @@ import org.springframework.util.MimeTypeUtils;
  * The {@link TensorflowOutputConverter} can be extended and customized to provide a convenient data representations,
  * accustomed for a particular model (see TwitterSentimentTensorflowOutputConverter.java)
  *
- * By default the inference result is returned in the outbound Message payload. If the saveResultInHeader property is
- * set to true then the inference result would be stored in the outbound Message header by name as set by
- * the getResultHeader property. In this case the message payload is the same like the inbound message payload.
+ * The {@link OutputMessageBuilder} defines how the computed inference score is arranged withing the output message.
  *
  * @author Christian Tzolov
  * @author Artem Bilan
  */
 @EnableConfigurationProperties(TensorflowCommonProcessorProperties.class)
 public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
-
-	public static final String ORIGINAL_INPUT_DATA = "original.input.data";
 
 	private static final Log logger = LogFactory.getLog(TensorflowCommonProcessorConfiguration.class);
 
@@ -94,6 +86,10 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 	@Autowired
 	@Qualifier("tensorflowOutputConverter")
 	private TensorflowOutputConverter tensorflowOutputConverter;
+
+	@Autowired
+	@Qualifier("tensorflowOutputMessageBuilder")
+	private OutputMessageBuilder tensorflowOutputMessageBuilder;
 
 	@Autowired
 	private TensorFlowService tensorFlowService;
@@ -116,51 +112,17 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 
 		Object outputData = tensorflowOutputConverter.convert(outputTensorMap, processorContext);
 
-		switch (this.properties.getMode()) {
+		return tensorflowOutputMessageBuilder.createOutputMessageBuilder(input, outputData);
 
-		case tuple:
-			TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(properties.getOutputName(), outputData);
+	}
 
-			Object payload = input.getPayload();
-
-			if (payload instanceof Tuple && ((Tuple) payload).hasFieldName(ORIGINAL_INPUT_DATA)) {
-				// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
-				// content of the input tuple in the new tuple to be returned.
-				outTupleBuilder.putAll((Tuple) payload);
-			}
-			else {
-				// This is a new tuple so preserve the input data.
-				outTupleBuilder.put(ORIGINAL_INPUT_DATA, payload);
-			}
-
-			return MessageBuilder
-					.withPayload(outTupleBuilder.build())
-					.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple");
-
-		case header:
-			MessageBuilder<?> builder = MessageBuilder
-					.withPayload(input.getPayload())
-					.setHeader(this.properties.getOutputName(), outputData);
-			if (input.getHeaders().get(MessageHeaders.CONTENT_TYPE) != null) {
-				builder.setHeader(MessageHeaders.CONTENT_TYPE, input.getHeaders().get(MessageHeaders.CONTENT_TYPE));
-			}
-			return builder;
-
-		default:
-			builder = MessageBuilder
-					.withPayload(outputData);
-			if (outputData instanceof Tuple) {
-				builder.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple");
-				return builder;
-			} else if (outputData instanceof String) {
-				builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
-				return builder;
-			}
-
-			builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
-			return builder;
-		}
-
+	/**
+	 * @return a default output message builder
+	 */
+	@Bean
+	@ConditionalOnMissingBean(name = "tensorflowOutputMessageBuilder")
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new DefaultOutputMessageBuilder(properties);
 	}
 
 	@Bean
@@ -187,7 +149,8 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 
 			if (input instanceof Map) {
 				return (Map<String, Object>) input;
-			} else if (input instanceof Tuple) {
+			}
+			else if (input instanceof Tuple) {
 				Tuple tuple = (Tuple) input;
 				Map<String, Object> map = new LinkedHashMap<>(tuple.size());
 				for (int i = 0; i < tuple.size(); i++) {

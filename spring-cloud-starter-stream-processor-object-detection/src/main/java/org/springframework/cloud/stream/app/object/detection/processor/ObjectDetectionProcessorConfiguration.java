@@ -27,6 +27,7 @@ import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommo
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -47,13 +48,16 @@ public class ObjectDetectionProcessorConfiguration {
 	@Autowired
 	private ObjectDetectionProcessorProperties properties;
 
+	@Autowired
+	private TensorflowCommonProcessorProperties commonProperties;
+
 	@Bean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
 		if (logger.isInfoEnabled()) {
 			logger.info("Load ObjectDetectionTensorflowOutputConverter " + properties.getLabels());
 		}
 		return new ObjectDetectionTensorflowOutputConverter(properties.getLabels(),
-				properties.getConfidence());
+				properties.getConfidence(), commonProperties.getModelFetch());
 	}
 
 	@Bean
@@ -62,5 +66,11 @@ public class ObjectDetectionProcessorConfiguration {
 		logger.info("Load ObjectDetectionTensorflowInputConverter");
 		return new ObjectDetectionTensorflowInputConverter();
 	}
+
+	@Bean
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(), commonProperties);
+	}
+
 
 }

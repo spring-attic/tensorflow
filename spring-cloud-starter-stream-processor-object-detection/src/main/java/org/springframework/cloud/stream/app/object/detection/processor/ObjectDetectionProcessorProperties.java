@@ -41,6 +41,11 @@ public class ObjectDetectionProcessorProperties {
 	 */
 	private float confidence = 0.4f;
 
+	/**
+	 * When set to true, the output image will be annotated with the detected object boxes
+	 */
+	private boolean drawBoundingBox = true;
+
 	@NotNull
 	public Resource getLabels() {
 		return labels;
@@ -56,5 +61,13 @@ public class ObjectDetectionProcessorProperties {
 
 	public void setConfidence(float confidence) {
 		this.confidence = confidence;
+	}
+
+	public boolean isDrawBoundingBox() {
+		return drawBoundingBox;
+	}
+
+	public void setDrawBoundingBox(boolean drawBoundingBox) {
+		this.drawBoundingBox = drawBoundingBox;
 	}
 }

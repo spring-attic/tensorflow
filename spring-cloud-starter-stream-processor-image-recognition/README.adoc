@@ -41,6 +41,7 @@ $$tensorflow.expression$$:: $$How to obtain the input data from the input messag
  The payload.myInTupleName expression treats the input payload as a Tuple, and myInTupleName stands for
  a Tuple key. The headers[myHeaderName] expression to get input data from message's header using
  myHeaderName as a key.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$tensorflow.image.recognition.draw-labels$$:: $$When set to true it augment the input image with the predicted labels$$ *($$Boolean$$, default: `$$true$$`)*
 $$tensorflow.image.recognition.labels$$:: $$The text file containing the category names (e.g. labels) of all categories
  that this model is trained to recognize. Every category is on a separate line.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.image.recognition.response-size$$:: $$Number of top K alternatives to add to the result. Only used when the responseSize > 0.$$ *($$Integer$$, default: `$$1$$`)*

@@ -49,6 +49,7 @@ $$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resour
 $$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
 $$tensorflow.object.detection.confidence$$:: $$Probability threshold. Only objects detected with probability higher then
  the confidence threshold are accepted. Value is between 0 and 1.$$ *($$Float$$, default: `$$0.4$$`)*
+$$tensorflow.object.detection.draw-bounding-box$$:: $$When set to true, the output image will be annotated with the detected object boxes$$ *($$Boolean$$, default: `$$true$$`)*
 $$tensorflow.object.detection.labels$$:: $$The text file containing the category names (e.g. labels) of all categories
  that this model is trained to recognize. Every category is on a separate line.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple modes.$$ *($$String$$, default: `$$result$$`)*

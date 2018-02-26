@@ -41,6 +41,11 @@ public class ImageRecognitionProcessorProperties {
 	 */
 	private int responseSize = 1;
 
+	/**
+	 * When set to true it augment the input image with the predicted labels
+	 */
+	private boolean drawLabels = true;
+
 	@NotNull
 	public Resource getLabels() {
 		return labels;
@@ -60,4 +65,11 @@ public class ImageRecognitionProcessorProperties {
 		this.responseSize = responseSize;
 	}
 
+	public boolean isDrawLabels() {
+		return drawLabels;
+	}
+
+	public void setDrawLabels(boolean drawLabels) {
+		this.drawLabels = drawLabels;
+	}
 }

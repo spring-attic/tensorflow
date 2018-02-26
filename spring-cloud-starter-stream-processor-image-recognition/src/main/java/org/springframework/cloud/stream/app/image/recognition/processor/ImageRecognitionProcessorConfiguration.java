@@ -27,6 +27,7 @@ import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommo
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -38,7 +39,7 @@ import org.springframework.context.annotation.Import;
  */
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties({
-		ImageRecognitionProcessorProperties.class, TensorflowCommonProcessorProperties.class})
+		ImageRecognitionProcessorProperties.class, TensorflowCommonProcessorProperties.class })
 @Import(TensorflowCommonProcessorConfiguration.class)
 public class ImageRecognitionProcessorConfiguration {
 
@@ -46,6 +47,9 @@ public class ImageRecognitionProcessorConfiguration {
 
 	@Autowired
 	private ImageRecognitionProcessorProperties properties;
+
+	@Autowired
+	private TensorflowCommonProcessorProperties commonProperties;
 
 	@Bean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
@@ -62,4 +66,8 @@ public class ImageRecognitionProcessorConfiguration {
 		return new ImageRecognitionTensorflowInputConverter();
 	}
 
+	@Bean
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new ImageRecognitionOutputMessageBuilder(properties.isDrawLabels(), commonProperties);
+	}
 }

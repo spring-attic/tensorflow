@@ -89,8 +89,7 @@ public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutp
 
 			for (int i = 0; i < topKProbabilities.size(); i++) {
 				int probabilityIndex = topKProbabilities.get(i);
-				tuples.add(TupleBuilder.tuple().of(labels.get(probabilityIndex),
-						labelProbabilities[probabilityIndex]));
+				tuples.add(TupleBuilder.tuple().of(labels.get(probabilityIndex), labelProbabilities[probabilityIndex]));
 			}
 		}
 
@@ -98,27 +97,27 @@ public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutp
 
 	}
 
-	private List<Integer> indexesOfTopKProbabilities(final float[] probabilites, int k) {
-		float[] copy = Arrays.copyOf(probabilites,probabilites.length);
+	private List<Integer> indexesOfTopKProbabilities(final float[] probabilities, int k) {
+		float[] copy = Arrays.copyOf(probabilities,probabilities.length);
 		Arrays.sort(copy);
 		float[] honey = Arrays.copyOfRange(copy,copy.length - k, copy.length);
 		int[] result = new int[k];
 		int resultPos = 0;
-		for(int i = 0; i < probabilites.length; i++) {
-			float onTrial = probabilites[i];
+		for(int i = 0; i < probabilities.length; i++) {
+			float onTrial = probabilities[i];
 			int index = Arrays.binarySearch(honey,onTrial);
 			if(index < 0) continue;
 			result[resultPos++] = i;
 		}
-		return sortByProb(probabilites, result);
+		return sortByProb(probabilities, result);
 	}
 
-	private List<Integer> sortByProb(final float[] probabilites, int[] topK) {
+	private List<Integer> sortByProb(final float[] probabilities, int[] topK) {
 		List<Integer> topKList = Arrays.stream(topK).boxed().collect(Collectors.toList());
 		Collections.sort(topKList, (o1, o2) -> {
-			if (probabilites[o1] == probabilites[o2]) {
+			if (probabilities[o1] == probabilities[o2]) {
 				return 0;
-			} else if (probabilites[o1] < probabilites[o2]) {
+			} else if (probabilities[o1] < probabilities[o2]) {
 				return 1;
 			}
 			return -1;

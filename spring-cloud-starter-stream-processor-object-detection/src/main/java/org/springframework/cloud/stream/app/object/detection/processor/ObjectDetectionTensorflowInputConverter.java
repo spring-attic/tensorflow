@@ -33,11 +33,18 @@ import org.tensorflow.types.UInt8;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 
 /**
+ * Converts byte array image into a input Tensor for the Object Detection API. The computed image tensors uses the
+ * 'image_tensor' model placeholder.
+ *
  * @author Christian Tzolov
  */
 public class ObjectDetectionTensorflowInputConverter implements TensorflowInputConverter {
 
 	private static final Log logger = LogFactory.getLog(ObjectDetectionTensorflowInputConverter.class);
+
+	private static final long BATCH_SIZE = 1;
+	private static final long CHANNELS = 3;
+	public static final String IMAGE_TENSOR_FEED_NAME = "image_tensor";
 
 	@Override
 	public Map<String, Object> convert(Object input, Map<String, Object> processorContext) {
@@ -46,7 +53,7 @@ public class ObjectDetectionTensorflowInputConverter implements TensorflowInputC
 			try {
 				Tensor inputImageTensor = makeImageTensor((byte[]) input);
 				Map<String, Object> inputMap = new HashMap<>();
-				inputMap.put("image_tensor", inputImageTensor);
+				inputMap.put(IMAGE_TENSOR_FEED_NAME, inputImageTensor);
 
 				return inputMap;
 			}
@@ -55,35 +62,32 @@ public class ObjectDetectionTensorflowInputConverter implements TensorflowInputC
 			}
 		}
 
-		throw new IllegalArgumentException("Unsupported payload type: " + input);
-
+		throw new IllegalArgumentException(String.format("Expected byte[] payload type, found: %s", input));
 	}
 
-	private static void bgr2rgb(byte[] data) {
+	private static Tensor<UInt8> makeImageTensor(byte[] imageBytes) throws IOException {
+		ByteArrayInputStream is = new ByteArrayInputStream(imageBytes);
+		BufferedImage img = ImageIO.read(is);
+
+		if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
+			throw new IllegalArgumentException(
+					String.format("Expected 3-byte BGR encoding in BufferedImage, found %d", img.getType()));
+		}
+		byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
+		// ImageIO.read produces BGR-encoded images, while the model expects RGB.
+		bgrToRgb(data);
+
+		//Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+		long[] shape = new long[] { BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS };
+
+		return Tensor.create(UInt8.class, shape, ByteBuffer.wrap(data));
+	}
+
+	private static void bgrToRgb(byte[] data) {
 		for (int i = 0; i < data.length; i += 3) {
 			byte tmp = data[i];
 			data[i] = data[i + 2];
 			data[i + 2] = tmp;
 		}
 	}
-
-	private static Tensor<UInt8> makeImageTensor(byte[] imageBytes) throws IOException {
-		ByteArrayInputStream is = new ByteArrayInputStream(imageBytes);
-		BufferedImage img = ImageIO.read(is);
-		//img.getGraphics().drawRect(10, 10, 70, 70);
-
-		if (img.getType() != BufferedImage.TYPE_3BYTE_BGR) {
-			throw new IOException(
-					String.format("Expected 3-byte BGR encoding in BufferedImage, found %d", img.getType()));
-		}
-		byte[] data = ((DataBufferByte) img.getData().getDataBuffer()).getData();
-		// ImageIO.read seems to produce BGR-encoded images, but the model expects RGB.
-		bgr2rgb(data);
-		final long BATCH_SIZE = 1;
-		final long CHANNELS = 3;
-		long[] shape = new long[] { BATCH_SIZE, img.getHeight(), img.getWidth(), CHANNELS };
-
-		return Tensor.create(UInt8.class, shape, ByteBuffer.wrap(data));
-	}
-
 }
