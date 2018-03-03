@@ -162,7 +162,9 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 							.put("x1", boxes[i][0])
 							.put("y1", boxes[i][1])
 							.put("x2", boxes[i][2])
-							.put("y2", boxes[i][3]).build());
+							.put("y2", boxes[i][3])
+							.put("cid", (int) classes[i])
+							.build());
 				}
 			}
 

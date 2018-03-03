@@ -2,32 +2,35 @@
 
 = Object Detection Processor
 
-A processor that uses the https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] for localizing and identifying multiple objects in a single image.
+A processor based on the https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] for localizing and identifying multiple objects in a single image.
+
 It can use one of the pre-trained https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md[object detection models] and categorization https://github.com/tensorflow/models/tree/865c14c/research/object_detection/data[labels].
 
-The input of the processor is an image as binary array. The output is a Tuple (or JSON) message in this format:
+If a pre-trained model is not set explicitly then following defaults are used:
+
+* `tensorflow.modelFetch` : `detection_scores,detection_classes,detection_boxes,num_detections`
+* `tensorflow.model` : `http://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb`
+* `tensorflow.object.detection.labels` : `http://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt`
+
+Processor's input is an image byte array and the output is a Tuple (or JSON) message in this format:
 
 ```json
 {
   "labels" : [
-     {"person":0.9996774,"x1":0.0,"y1":0.3940161,"x2":0.9465165,"y2":0.5592592},
-     {"person":0.9996604,"x1":0.047891676,"y1":0.03169123,"x2":0.941098,"y2":0.2085562},
-     {"backpack":0.96534747,"x1":0.15588468,"y1":0.85957795,"x2":0.5091308,"y2":0.9908878},
-     {"backpack":0.963343,"x1":0.1273736,"y1":0.57658505,"x2":0.47765,"y2":0.6986431}
+     {"person":0.9996774,"x1":0.0,"y1":0.3940161,"x2":0.9465165,"y2":0.5592592,"cid":1},
+     {"person":0.9996604,"x1":0.047891676,"y1":0.03169123,"x2":0.941098,"y2":0.2085562,"cid":1},
+     {"backpack":0.96534747,"x1":0.15588468,"y1":0.85957795,"x2":0.5091308,"y2":0.9908878,"cid":23},
+     {"backpack":0.963343,"x1":0.1273736,"y1":0.57658505,"x2":0.47765,"y2":0.6986431,"cid":23}
   ]
 }
 
 ```
-Response format looks like this:
 
-```
-"object-name":confidence float[0-1],
-"x1": float[0-1], "y1": float[0-1],
-"x2": float[0-1], "y2":float[0-1]
-```
+The output format is:
 
-Response contains the name of the recognized category (e.g. label) along with the confidence (e.g. confidence) that the image contains this category.
-Response also provides the bounding box of the detected objects represented as (x1, y1, x2, y2). The coordinates are relative to the size of the image.
+* *object-name*:**confidence** - human readable name of the detected object (e.g. label) with its confidence as a float between [0-1]
+* *x1*, *y1*, *x2*, *y2* - Response also provides the bounding box of the detected objects represented as (x1, y1, x2, y2). The coordinates are relative to the size of the image size.
+* *cid*  - Classification identifier as defined in the provided https://github.com/tensorflow/models/tree/865c14c/research/object_detection/data[labels] configuration file.
 
 
 == Options
@@ -47,6 +50,8 @@ $$tensorflow.mode$$:: $$Defines how to store the output data and if the input pa
  a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`tuple`,`header`)*
 $$tensorflow.model$$:: $$The location of the TensorFlow model file.$$ *($$Resource$$, default: `$$<none>$$`)*
 $$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$tensorflow.object.detection.color-agnostic$$:: $$If disabled (default) the bounding box colors are selected as a function of the object class id.
+ If enabled all bounding boxes are visualized with a single color.$$ *($$Boolean$$, default: `$$false$$`)*
 $$tensorflow.object.detection.confidence$$:: $$Probability threshold. Only objects detected with probability higher then
  the confidence threshold are accepted. Value is between 0 and 1.$$ *($$Float$$, default: `$$0.4$$`)*
 $$tensorflow.object.detection.draw-bounding-box$$:: $$When set to true, the output image will be annotated with the detected object boxes$$ *($$Boolean$$, default: `$$true$$`)*
@@ -58,6 +63,32 @@ $$tensorflow.output-name$$:: $$The output data key used in the Header or Tuple m
 //end::ref-doc[]
 == Build
 
+
 ```
-$> mvn package
+$ ./mvnw clean install -PgenerateApps
+$ cd apps
 ```
+You can find the corresponding binder based projects here.
+You can then cd into one of the folders and build it:
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar object-detection-processor.jar --tensorflow.object.detection.labels= --tensorflow.model= \
+    --tensorflow.modelFetch= --tensorflow.mode=
+```
+
+And here is a example pipeline that process images in `file` source and outputs the annotated images to `image-viewer`:
+
+```
+object-detector-stream=file --directory='/tmp/images'
+| object-detector --tensorflow.mode=header
+    --tensorflow.model='http://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb'
+    --tensorflow.model-fetch='detection_scores,detection_classes,detection_boxes'
+    --tensorflow.object.detection.labels='http://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt'
+| image-viewer
+```
+

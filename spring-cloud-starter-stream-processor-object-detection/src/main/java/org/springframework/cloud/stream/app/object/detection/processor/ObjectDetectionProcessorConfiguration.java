@@ -23,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
-import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -69,8 +69,8 @@ public class ObjectDetectionProcessorConfiguration {
 
 	@Bean
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
-		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(), commonProperties);
+		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(), properties.isColorAgnostic(),
+				commonProperties);
 	}
-
 
 }

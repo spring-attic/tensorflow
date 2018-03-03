@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.app.object.detection.processor;
 
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -48,15 +46,15 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 
 	public static final String IMAGE_FORMAT = "jpg";
 
-	private final Color textColor = Color.BLACK;
-	private final Color bgColor = new Color(167, 252, 0);
-	private final float lineThickness = 2;
 	private final boolean drawBoundingBox;
 
-	public ObjectDetectionOutputMessageBuilder(boolean drawBoundingBox,
+	private final boolean agnosticColors;
+
+	public ObjectDetectionOutputMessageBuilder(boolean drawBoundingBox, boolean agnosticColors,
 			TensorflowCommonProcessorProperties properties) {
 		super(properties);
 		this.drawBoundingBox = drawBoundingBox;
+		this.agnosticColors = agnosticColors;
 	}
 
 	@Override
@@ -72,44 +70,26 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 	}
 
 	private byte[] drawBoundingBox(byte[] imageBytes, Object result) {
-		try {
-			if (result != null) {
+		if (result != null) {
+			try {
 				BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
-
-
-				Graphics2D g = originalImage.createGraphics();
-				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 				Tuple resultTuple = new JsonStringToTupleConverter().convert(result.toString());
 				ArrayList<Tuple> labels = (ArrayList) resultTuple.getValues().get(0);
 
 				for (Tuple l : labels) {
+					int y1 = (int) (l.getFloat(1) * (float) originalImage.getHeight());
+					int x1 = (int) (l.getFloat(2) * (float) originalImage.getWidth());
+					int y2 = (int) (l.getFloat(3) * (float) originalImage.getHeight());
+					int x2 = (int) (l.getFloat(4) * (float) originalImage.getWidth());
 
-					float y1 = l.getFloat(1) * (float) originalImage.getHeight();
-					float x1 = l.getFloat(2) * (float) originalImage.getWidth();
-					float y2 = l.getFloat(3) * (float) originalImage.getHeight();
-					float x2 = l.getFloat(4) * (float) originalImage.getWidth();
-
-					g.setColor(bgColor);
-
-					Stroke oldStroke = g.getStroke();
-					g.setStroke(new BasicStroke(lineThickness));
-					g.drawRect((int) x1, (int) y1, (int) (x2 - x1), (int) (y2 - y1));
-					g.setStroke(oldStroke);
+					int cid = l.getInt("cid");
 
 					String labelName = l.getFieldNames().get(0);
 					int probability = (int) (100 * l.getFloat(0));
 					String title = labelName + ": " + probability + "%";
 
-					FontMetrics fm = g.getFontMetrics();
-					Rectangle2D rect = fm.getStringBounds(title, g);
-
-					g.setColor(bgColor);
-					g.fillRect((int) x1, (int) y1 - fm.getAscent(),
-							(int) rect.getWidth() + 6, (int) rect.getHeight());
-
-					g.setColor(textColor);
-					g.drawString(title, (int) x1 + 3, (int) y1);
+					GraphicsUtils.drawBoundingBox(originalImage, cid, title, x1, y1, x2, y2, agnosticColors);
 				}
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -118,9 +98,9 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 				imageBytes = baos.toByteArray();
 				baos.close();
 			}
-		}
-		catch (IOException e) {
-			logger.error(e);
+			catch (IOException e) {
+				logger.error(e);
+			}
 		}
 
 		// Null mend that QR image is found and not output message will be send.
