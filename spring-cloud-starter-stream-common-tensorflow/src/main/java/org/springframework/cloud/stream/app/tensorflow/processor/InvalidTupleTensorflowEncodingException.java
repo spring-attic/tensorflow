@@ -18,13 +18,13 @@ package org.springframework.cloud.stream.app.tensorflow.processor;
 /**
  * @author Christian Tzolov
  */
-public class InvalidTupleTensorflowEncoding extends RuntimeException {
+public class InvalidTupleTensorflowEncodingException extends RuntimeException {
 
-	public InvalidTupleTensorflowEncoding(String message) {
+	public InvalidTupleTensorflowEncodingException(String message) {
 		super(message);
 	}
 
-	public InvalidTupleTensorflowEncoding(String message, Throwable throwable) {
+	public InvalidTupleTensorflowEncodingException(String message, Throwable throwable) {
 		super(message, throwable);
 	}
 }

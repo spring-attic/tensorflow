@@ -66,7 +66,7 @@ public class TensorTupleConverter {
 			return Tensor.create(dataTypeToClass(dataType), shape, ByteBuffer.wrap(tfValue));
 		}
 		catch (Throwable throwable) {
-			throw new InvalidTupleTensorflowEncoding(String.format("Can not covert tuple:'%s' into Tensor", tuple), throwable);
+			throw new InvalidTupleTensorflowEncodingException(String.format("Can not covert tuple:'%s' into Tensor", tuple), throwable);
 		}
 	}
 

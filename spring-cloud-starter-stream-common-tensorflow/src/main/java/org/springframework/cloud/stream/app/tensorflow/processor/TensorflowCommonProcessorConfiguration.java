@@ -68,7 +68,7 @@ import org.springframework.util.MimeType;
  * @author Artem Bilan
  */
 @EnableConfigurationProperties(TensorflowCommonProcessorProperties.class)
-public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
+public class TensorflowCommonProcessorConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TensorflowCommonProcessorConfiguration.class);
 
@@ -162,32 +162,4 @@ public class TensorflowCommonProcessorConfiguration implements AutoCloseable {
 			throw new MessageConversionException("Unsupported input format: " + input);
 		};
 	}
-
-	@Bean
-	@StreamMessageConverter
-	public MessageConverter toTensorMessageConverter() {
-		return new AbstractMessageConverter(new MimeType("application", "x-tensor")) {
-			@Override
-			protected boolean supports(Class<?> clazz) {
-				return Tensor.class.equals(clazz);
-			}
-
-			@Override
-			protected Object convertFromInternal(Message<?> message, Class<?> targetClass, Object conversionHint) {
-				Object payload = message.getPayload();
-				if (payload instanceof Tensor) {
-					return payload;
-				}
-				Tuple tuple = new JsonBytesToTupleConverter().convert((byte[]) payload);
-				return TensorTupleConverter.toTensor(tuple);
-			}
-		};
-	}
-
-	@Override
-	public void close() throws Exception {
-		logger.info("Close TensorflowCommonProcessorConfiguration");
-		tensorFlowService.close();
-	}
-
 }

@@ -16,21 +16,20 @@
 
 package org.springframework.cloud.stream.app.image.recognition.processor;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Test;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Configuration;
 
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
+
 /**
  * @author Christian Tzolov
  */
-public class ImageRecognitionProcessorPropertiesTest {
+public class ImageRecognitionProcessorPropertiesTests {
 
 	@Test
 	public void labelsCanBeCustomized() {

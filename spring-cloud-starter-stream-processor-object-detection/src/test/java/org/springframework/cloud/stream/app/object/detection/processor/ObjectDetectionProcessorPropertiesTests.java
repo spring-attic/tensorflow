@@ -29,7 +29,7 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Christian Tzolov
  */
-public class ObjectDetectionProcessorPropertiesTest {
+public class ObjectDetectionProcessorPropertiesTests {
 
 	@Test
 	public void labelsCanBeCustomized() {

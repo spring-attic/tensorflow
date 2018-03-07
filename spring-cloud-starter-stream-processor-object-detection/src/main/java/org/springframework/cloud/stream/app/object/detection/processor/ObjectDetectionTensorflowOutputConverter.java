@@ -135,7 +135,7 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 			float[] classes = classesTensor.copyTo(new float[1][maxObjects])[0];
 			float[][] boxes = boxesTensor.copyTo(new float[1][maxObjects][4])[0];
 
-			// Work in progress
+			// (Future work) enabler for supporting image-segmentation
 			if (modelFetch.contains(DETECTION_MASKS) && modelFetch.contains(NUM_DETECTIONS)) {
 				try (Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
 					 Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);

@@ -16,22 +16,47 @@
 
 package org.springframework.cloud.stream.app.object.detection.processor;
 
-
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 /**
+ * Utility class used to provide some handy image manipulation functions. Among others it can provide contrast colors
+ * for image annotation labels and bounding boxes as well as functionality to draw later.
+ *
  * @author Christian Tzolov
  */
 public class GraphicsUtils {
 
+	/**
+	 * Default DEFAULT_FONT used in image label annotation.
+	 */
+	private static final Font DEFAULT_FONT = new Font("arial", Font.PLAIN, 12);
 
-	private static final Font font = new Font("arial", Font.PLAIN, 12);
-	private static final float lineThickness = 2;
-	private static final Color agnosticColor = new Color(167, 252, 0);
+	/**
+	 * Bounding box default line thickness
+	 */
+	private static final float LINE_THICKNESS = 2;
+
+	/**
+	 * Color used when no multi-color is used
+	 */
+	private static final Color AGNOSTIC_COLOR = new Color(167, 252, 0);
+
+	/**
+	 * in labels text offset.
+	 */
 	public static final int TITLE_OFFSET = 3;
 
+	/**
+	 * Predefined contrasting colors used when drawing multiple objects in the same image.
+	 */
 	public static final Color aliceblue = new Color(240, 248, 255);
 	public static final Color antiquewhite = new Color(250, 235, 215);
 	public static final Color aqua = new Color(0, 255, 255);
@@ -174,7 +199,7 @@ public class GraphicsUtils {
 	public static final Color yellowgreen = new Color(154, 205, 50);
 
 
-	public static final Color[] CLASS_COLOR = new Color[] {
+	private static final Color[] CLASS_COLOR = new Color[] {
 			aliceblue, chartreuse, aqua, aquamarine, azure, beige, bisque,
 			blanchedalmond, blueviolet, burlywood, cadetblue, antiquewhite,
 			chocolate, coral, cornflowerblue, cornsilk, crimson, cyan,
@@ -200,24 +225,42 @@ public class GraphicsUtils {
 			whitesmoke, yellow, yellowgreen
 	};
 
-	public static Color getClassColor(int classId) {
-		return CLASS_COLOR[classId % CLASS_COLOR.length];
+	/**
+	 * Return different color for each Id. It rotates when the ID exceeds the number of predefined colors.
+	 * @param id the unique id to pick color for.
+	 * @return a distinct color computed from the input #id
+	 */
+	public static Color getClassColor(int id) {
+		return CLASS_COLOR[id % CLASS_COLOR.length];
 	}
 
+	/**
+	 * Augments the input image with a labeled rectangle (e.g. bounding box) with coordinates: (x1, y1, x2, y2).
+	 *
+	 * @param image Input image to be augmented with labeled rectangle.
+	 * @param cid Unique id used to select the color of the rectangle. Used only if the colorAgnostic is set to false.
+	 * @param title rectangle title
+	 * @param x1 top left corner for the bounding box
+	 * @param y1 top left corner for the bounding box
+	 * @param x2 bottom right corner for the bounding box
+	 * @param y2 bottom right corner for the bounding box
+	 * @param colorAgnostic If set to false the cid is used to select the bounding box color. Uses the
+	 *                      AGNOSTIC_COLOR otherwise.
+	 */
 	public static void drawBoundingBox(BufferedImage image, int cid, String title, int x1, int y1, int x2, int y2,
 			boolean colorAgnostic) {
 
 		Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		Color labelColor = colorAgnostic ? agnosticColor : GraphicsUtils.getClassColor(cid);
+		Color labelColor = colorAgnostic ? AGNOSTIC_COLOR : GraphicsUtils.getClassColor(cid);
 		g.setColor(labelColor);
 
-		g.setFont(font);
+		g.setFont(DEFAULT_FONT);
 		FontMetrics fontMetrics = g.getFontMetrics();
 
 		Stroke oldStroke = g.getStroke();
-		g.setStroke(new BasicStroke(lineThickness));
+		g.setStroke(new BasicStroke(LINE_THICKNESS));
 		g.drawRect(x1, y1, (x2 - x1), (y2 - y1));
 		g.setStroke(oldStroke);
 
@@ -232,7 +275,7 @@ public class GraphicsUtils {
 	}
 
 	/**
-	 * Depends on the darkness of the background, pick a dark or light font color
+	 * Depends on the darkness of the background, pick a dark or light DEFAULT_FONT color
 	 * @param backGroundColor background color within which the text is drawn
 	 * @return a text color, that contrast to the given background color.
 	 */

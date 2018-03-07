@@ -75,8 +75,8 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 				BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(imageBytes));
 
 				Tuple resultTuple = new JsonStringToTupleConverter().convert(result.toString());
-				ArrayList<Tuple> labels = (ArrayList) resultTuple.getValues().get(0);
 
+				ArrayList<Tuple> labels  = resultTuple.getValue("labels", ArrayList.class);
 				for (Tuple l : labels) {
 					int y1 = (int) (l.getFloat(1) * (float) originalImage.getHeight());
 					int x1 = (int) (l.getFloat(2) * (float) originalImage.getWidth());

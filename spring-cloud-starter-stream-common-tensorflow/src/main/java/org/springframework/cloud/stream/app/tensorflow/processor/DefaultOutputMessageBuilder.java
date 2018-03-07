@@ -91,14 +91,6 @@ public class DefaultOutputMessageBuilder implements OutputMessageBuilder {
 	}
 
 	private String findContentType(Object computedScore) {
-		if (computedScore instanceof Tuple) {
-			return APPLICATION_X_SPRING_TUPLE;
-		}
-		else if (computedScore instanceof String) {
-			return MimeTypeUtils.APPLICATION_JSON_VALUE;
-		}
-
-		// default
-		return MimeTypeUtils.APPLICATION_JSON_VALUE;
+		return (computedScore instanceof Tuple) ? APPLICATION_X_SPRING_TUPLE : MimeTypeUtils.APPLICATION_JSON_VALUE;
 	}
 }

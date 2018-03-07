@@ -114,10 +114,9 @@ public class ImageRecognitionOutputMessageBuilder extends DefaultOutputMessageBu
 			}
 		}
 		catch (IOException e) {
-			logger.error(e);
+			logger.error("Failed to draw labels in the input image", e);
 		}
 
-		// Null mend that QR image is found and not output message will be send.
 		return imageBytes;
 	}
 
