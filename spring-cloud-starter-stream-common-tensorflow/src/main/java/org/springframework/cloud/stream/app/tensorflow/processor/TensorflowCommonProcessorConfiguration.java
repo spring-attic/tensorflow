@@ -120,6 +120,7 @@ public class TensorflowCommonProcessorConfiguration {
 	 * @return a default output message builder
 	 */
 	@Bean
+	@RefreshScope
 	@ConditionalOnMissingBean(name = "tensorflowOutputMessageBuilder")
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new DefaultOutputMessageBuilder(properties);
@@ -142,6 +143,7 @@ public class TensorflowCommonProcessorConfiguration {
 	}
 
 	@Bean
+	@RefreshScope
 	@ConditionalOnMissingBean(name = "tensorflowInputConverter")
 	@SuppressWarnings("unchecked")
 	public TensorflowInputConverter tensorflowInputConverter() {

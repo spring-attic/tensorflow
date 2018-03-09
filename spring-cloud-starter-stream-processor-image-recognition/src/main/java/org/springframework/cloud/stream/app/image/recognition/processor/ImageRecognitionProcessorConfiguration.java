@@ -67,6 +67,7 @@ public class ImageRecognitionProcessorConfiguration {
 	}
 
 	@Bean
+	@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new ImageRecognitionOutputMessageBuilder(properties.isDrawLabels(), commonProperties);
 	}
