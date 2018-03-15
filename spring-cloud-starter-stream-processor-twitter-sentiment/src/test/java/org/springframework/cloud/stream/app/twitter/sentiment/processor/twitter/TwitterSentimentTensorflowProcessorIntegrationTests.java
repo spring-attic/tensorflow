@@ -19,6 +19,7 @@ package org.springframework.cloud.stream.app.twitter.sentiment.processor.twitter
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,7 +53,7 @@ import static org.hamcrest.Matchers.equalTo;
 				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
-//@Ignore("Exclude the Twitter Sentiment Processor Integration Test until a proper Mock TF Model is provided!")
+@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 
 	@Autowired

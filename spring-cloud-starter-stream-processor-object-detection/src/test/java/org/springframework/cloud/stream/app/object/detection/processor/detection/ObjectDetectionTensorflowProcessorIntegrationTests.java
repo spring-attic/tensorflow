@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -59,6 +60,7 @@ import static org.hamcrest.Matchers.equalTo;
 				//"tensorflow.object.detection.labels=file:/Users/ctzolov/Downloads/oid_bbox_trainable_label_map.pbtxt"
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 
 	@Autowired

@@ -16,12 +16,11 @@
 
 package org.springframework.cloud.stream.app.image.recognition.processor.inception;
 
-import static org.hamcrest.Matchers.equalTo;
-
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,8 +38,9 @@ import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.tuple.Tuple;
 import org.springframework.util.StreamUtils;
+
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * @author Christian Tzolov
@@ -55,6 +55,7 @@ import org.springframework.util.StreamUtils;
 				"tensorflow.image.recognition.labels=http://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt"
 		})
 @DirtiesContext
+@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 	@Autowired
