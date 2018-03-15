@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,19 +50,35 @@ public class TensorTupleConverter {
 
 		buffer.get(bytes, 0, bytes.length);
 
+		long[] shape = tensor.shape();
 		return TupleBuilder.tuple()
 				.put(TF_DATA_TYPE, tensor.dataType().name())
-				.put(TF_SHAPE, tensor.shape())
+				.put(TF_SHAPE, shape)
 				.put(TF_VALUE, bytes)
 				.build();
 	}
 
 	public static Tensor toTensor(Tuple tuple) {
-		DataType dataType = DataType.valueOf(tuple.getString(TF_DATA_TYPE));
-		long[] shape = (long[]) tuple.getValue(TF_SHAPE);
-		byte[] bytes = (byte[]) tuple.getValue(TF_VALUE);
+		try {
+			DataType dataType = DataType.valueOf(tuple.getString(TF_DATA_TYPE));
+			long[] shape = getShape(tuple);
+			byte[] tfValue = getTfValue(tuple);
+			return Tensor.create(dataTypeToClass(dataType), shape, ByteBuffer.wrap(tfValue));
+		}
+		catch (Throwable throwable) {
+			throw new InvalidTupleTensorflowEncodingException(String.format("Can not covert tuple:'%s' into Tensor", tuple), throwable);
+		}
+	}
 
-		return Tensor.create(dataTypeToClass(dataType), shape, ByteBuffer.wrap(bytes));
+	private static long[] getShape(Tuple tuple) {
+		Object shape = tuple.getValue(TF_SHAPE);
+		return (shape instanceof long[]) ? (long[]) shape :
+				((ArrayList<Long>) shape).stream().mapToLong(Long::longValue).toArray();
+	}
+
+	private static byte[] getTfValue(Tuple tuple) {
+		Object tfValue = tuple.getValue(TF_VALUE);
+		return tfValue instanceof String ? ((String) tfValue).getBytes() : (byte[]) tfValue;
 	}
 
 	private static final Map<DataType, Class<?>> typeToClassMap = new HashMap<>();

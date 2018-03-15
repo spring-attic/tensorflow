@@ -1,0 +1,6 @@
+tensorflow:
+  modelFetch: detection_scores,detection_classes,detection_boxes,num_detections
+  model: http://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb
+  object:
+    detection:
+      labels: http://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt

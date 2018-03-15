@@ -16,20 +16,23 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.tuple.Tuple;
-import org.springframework.util.StreamUtils;
 import org.tensorflow.Graph;
 import org.tensorflow.Session;
 import org.tensorflow.Session.Runner;
 import org.tensorflow.Tensor;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.springframework.core.io.Resource;
+import org.springframework.tuple.Tuple;
+import org.springframework.util.StreamUtils;
 
 /**
  * @author Christian Tzolov
@@ -50,7 +53,7 @@ public class TensorFlowService implements AutoCloseable {
 		}
 	}
 
-	public Tensor evaluate(Map<String, Object> feeds, String fetchedOperationName, int outputTensorIndex) {
+	public Map<String, Tensor<?>> evaluate(Map<String, Object> feeds, List<String> fetchedNames) {
 
 		try (Session session = new Session(graph)) {
 
@@ -59,14 +62,23 @@ public class TensorFlowService implements AutoCloseable {
 			// Keep tensor references to release them in the finally block
 			Tensor[] feedTensors = new Tensor[feeds.size()];
 			try {
-				int i = 0;
+				int inputIndex = 0;
 				for (Entry<String, Object> e : feeds.entrySet()) {
 					String feedName = e.getKey();
-					feedTensors[i] = toFeedTensor(e.getValue());
-					runner = runner.feed(feedName, feedTensors[i]);
-					i++;
+					feedTensors[inputIndex] = toFeedTensor(e.getValue());
+					runner = runner.feed(feedName, feedTensors[inputIndex]);
+					inputIndex++;
 				}
-				return runner.fetch(fetchedOperationName).run().get(outputTensorIndex);
+
+				for (String fetchName : fetchedNames) {
+					runner.fetch(fetchName);
+				}
+				List<Tensor<?>> outputTensors = runner.run();
+				Map<String, Tensor<?>> outTensorMap = new HashMap<>();
+				for (int outputIndex = 0; outputIndex < fetchedNames.size(); outputIndex++) {
+					outTensorMap.put(fetchedNames.get(outputIndex), outputTensors.get(outputIndex));
+				}
+				return outTensorMap;
 			}
 			finally {
 				// Release all feed tensors

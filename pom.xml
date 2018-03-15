@@ -15,12 +15,14 @@
 	</parent>
 
 	<modules>
-		<module>spring-cloud-starter-stream-processor-tensorflow</module>
 		<module>tensorflow-app-dependencies</module>
-		<module>tensorflow-app-starters-test-support</module>
-		<module>spring-cloud-starter-stream-processor-twitter-sentiment</module>
         <module>spring-cloud-starter-stream-common-tensorflow</module>
-    </modules>
+		<module>spring-cloud-starter-stream-processor-tensorflow</module>
+		<module>spring-cloud-starter-stream-processor-twitter-sentiment</module>
+		<module>spring-cloud-starter-stream-processor-image-recognition</module>
+		<module>spring-cloud-starter-stream-processor-object-detection</module>
+		<module>tensorflow-app-starters-test-support</module>
+	</modules>
 
 	<dependencyManagement>
 		<dependencies>

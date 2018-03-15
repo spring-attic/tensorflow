@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.app.twitter.sentiment.processor;
 
-import java.net.MalformedURLException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,9 +24,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
+import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
-import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -40,7 +38,7 @@ import org.springframework.context.annotation.Import;
  */
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties({
-		TwitterSentimentProcessorProperties.class, TensorflowCommonProcessorProperties.class})
+		TwitterSentimentProcessorProperties.class, TensorflowCommonProcessorProperties.class })
 @Import(TensorflowCommonProcessorConfiguration.class)
 public class TwitterSentimentProcessorConfiguration {
 
@@ -59,7 +57,7 @@ public class TwitterSentimentProcessorConfiguration {
 
 	@Bean
 	@RefreshScope
-	public TensorflowInputConverter tensorflowInputConverter() throws MalformedURLException {
+	public TensorflowInputConverter tensorflowInputConverter() {
 		if (logger.isInfoEnabled()) {
 			logger.info("Load vocabulary: " + properties.getVocabulary());
 		}
