@@ -19,7 +19,7 @@ image::{image-root}/TensorFlowProcessorArcutectureOverview.png[]
 
 The `--tensorflow.model` property configures the Processor with the location of the serialized Tensorflow model.
 
-The `TensorflowInputConverter` implementations converts the input data into the format, specific for the given model.
+The `TensorflowInputConverter` converts the input data into the format, specific for the given model.
 
 The `TensorflowOutputConverter` converts the computed `Tensors` result into a pipeline `Message`.
 
