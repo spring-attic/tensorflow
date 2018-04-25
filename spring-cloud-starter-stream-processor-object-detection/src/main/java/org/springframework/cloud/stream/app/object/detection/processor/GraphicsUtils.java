@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
@@ -283,5 +284,93 @@ public class GraphicsUtils {
 		double y = (299 * backGroundColor.getRed() + 587 * backGroundColor.getGreen() +
 				114 * backGroundColor.getBlue()) / 1000;
 		return y >= 128 ? Color.black : Color.white;
+	}
+
+	public static BufferedImage createMaskImage(float[][] maskPixels,
+			int scaledWidth, int scaledHeight, Color maskColor) {
+
+		int maskWidth = maskPixels.length;
+		int maskHeight = maskPixels[0].length;
+		int[] maskArray = new int[maskWidth * maskHeight];
+		int k = 0;
+		for (int i = 0; i < maskHeight; i++) {
+			for (int j = 0; j < maskWidth; j++) {
+				maskArray[k++] = grayScaleToARGB(maskPixels[i][j], maskColor);
+			}
+		}
+
+		// Turn the pixel array into image;
+		BufferedImage maskImage = new BufferedImage(maskWidth, maskHeight, BufferedImage.TYPE_INT_ARGB);
+		maskImage.setRGB(0, 0, maskWidth, maskHeight, maskArray, 0, maskWidth);
+
+		// Stretch the image to fit the target box width and height!
+		return toBufferedImage(maskImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_DEFAULT));
+	}
+
+	/**
+	 * Converts an gray scale (e.g. value between 0 to 1) into ARGB.
+	 *
+	 * @param grayScale - value between 0 and 1
+	 * @param maskColor - desired mask color
+	 * @return Returns a ARGB color based on the grayscale and the mask colors
+	 */
+	private static int grayScaleToARGB(float grayScale, Color maskColor) {
+		if (maskColor != null) {
+			float r = col(maskColor.getRed(), grayScale);
+			float g = col(maskColor.getGreen(), grayScale);
+			float b = col(maskColor.getBlue(), grayScale);
+			float t = grayScale * 0.7f;
+			return new Color(r, g, b, t).getRGB();
+		}
+
+		return new Color(grayScale, grayScale, grayScale, grayScale).getRGB();
+	}
+
+	private static float col(int channelColor, float grayScale) {
+		//return ((float) channelColor / 255) * grayScale;
+		return ((float) channelColor / 255);
+	}
+
+	public static BufferedImage toBufferedImage(Image img) {
+		if (img instanceof BufferedImage) {
+			return (BufferedImage) img;
+		}
+
+		// Create a buffered image with transparency
+		BufferedImage bimage = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+
+		// Draw the image on to the buffered image
+		Graphics2D bGr = bimage.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+
+		// Return the buffered image
+		return bimage;
+	}
+
+	public static BufferedImage overlayImages(BufferedImage bgImage, BufferedImage fgImage, int fgX, int fgY) {
+		// Foreground image width and height cannot be greater than background image width and height.
+		if (fgImage.getHeight() > bgImage.getHeight()
+				|| fgImage.getWidth() > fgImage.getWidth()) {
+			throw new IllegalArgumentException(
+					"Foreground Image Is Bigger In One or Both Dimensions"
+							+ "nCannot proceed with overlay."
+							+ "nn Please use smaller Image for foreground");
+		}
+
+		// Create a Graphics  from the background image
+		Graphics2D g = bgImage.createGraphics();
+
+		//Set Antialias Rendering
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		//Draw background image at location (0,0)
+		g.drawImage(bgImage, 0, 0, null);
+
+		// Draw foreground image at location (fgX,fgy)
+		g.drawImage(fgImage, fgX, fgY, null);
+
+		g.dispose();
+		return bgImage;
 	}
 }

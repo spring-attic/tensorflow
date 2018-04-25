@@ -70,8 +70,8 @@ public class ObjectDetectionProcessorConfiguration {
 	@Bean
 	@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
-		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(), properties.isColorAgnostic(),
-				commonProperties);
+		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(),
+				properties.isDrawMask(), properties.isColorAgnostic(), commonProperties);
 	}
 
 }

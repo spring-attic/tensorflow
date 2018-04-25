@@ -31,19 +31,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.cloud.stream.annotation.StreamMessageConverter;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.converter.AbstractMessageConverter;
 import org.springframework.messaging.converter.MessageConversionException;
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.tuple.JsonBytesToTupleConverter;
 import org.springframework.tuple.Tuple;
-import org.springframework.util.MimeType;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.

@@ -53,6 +53,15 @@ public class TensorFlowService implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Evaluates a pre-trained tensorflow model (encoded as {@link Graph}). Use the feeds parameter to feed in the
+	 * model input data and fetch-names to specify the output tensors.
+	 *
+	 * @param feeds Named map of input tensors. Tensors can be encoded as {@link Tensor} or {@link Tuple} objects.
+	 * @param fetchedNames Names of the output tensors computed by the model.
+	 * @return Returns the computed output tensors. The names of the output tensors is defined by the fetchedNames
+	 * argument
+	 */
 	public Map<String, Tensor<?>> evaluate(Map<String, Object> feeds, List<String> fetchedNames) {
 
 		try (Session session = new Session(graph)) {
@@ -62,6 +71,7 @@ public class TensorFlowService implements AutoCloseable {
 			// Keep tensor references to release them in the finally block
 			Tensor[] feedTensors = new Tensor[feeds.size()];
 			try {
+				// Feed in the input named tensors
 				int inputIndex = 0;
 				for (Entry<String, Object> e : feeds.entrySet()) {
 					String feedName = e.getKey();
@@ -70,10 +80,15 @@ public class TensorFlowService implements AutoCloseable {
 					inputIndex++;
 				}
 
+				// Set the tensor name to be fetched after the evaluation
 				for (String fetchName : fetchedNames) {
 					runner.fetch(fetchName);
 				}
+
+				// Evaluate the input
 				List<Tensor<?>> outputTensors = runner.run();
+
+				// Extract the output tensors
 				Map<String, Tensor<?>> outTensorMap = new HashMap<>();
 				for (int outputIndex = 0; outputIndex < fetchedNames.size(); outputIndex++) {
 					outTensorMap.put(fetchedNames.get(outputIndex), outputTensors.get(outputIndex));
@@ -91,6 +106,12 @@ public class TensorFlowService implements AutoCloseable {
 		}
 	}
 
+	/**
+	 * Convert an object into {@link Tensor} instance. Supports java primitive types, {@link Tuple} encoded
+	 * tensors or {@link Tensor} instances.
+	 * @param value Can be a java primitive type, {@link Tuple} encoded tensors or {@link Tensor} instances.
+	 * @return Tensor instance representing the input object value.
+	 */
 	private Tensor toFeedTensor(Object value) {
 		if (value instanceof Tensor) {
 			return (Tensor) value;

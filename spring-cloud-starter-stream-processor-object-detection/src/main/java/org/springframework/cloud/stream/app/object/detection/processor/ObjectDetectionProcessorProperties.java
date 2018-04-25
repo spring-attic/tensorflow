@@ -46,6 +46,12 @@ public class ObjectDetectionProcessorProperties {
 	 */
 	private boolean drawBoundingBox = true;
 
+
+	/**
+	 * For models with mask support enable drawing the mask of the detected objects
+	 */
+	private boolean drawMask = true;
+
 	/**
 	 * If disabled (default) the bounding box colors are selected as a function of the object class id.
 	 * If enabled all bounding boxes are visualized with a single color.
@@ -75,6 +81,14 @@ public class ObjectDetectionProcessorProperties {
 
 	public void setDrawBoundingBox(boolean drawBoundingBox) {
 		this.drawBoundingBox = drawBoundingBox;
+	}
+
+	public boolean isDrawMask() {
+		return drawMask;
+	}
+
+	public void setDrawMask(boolean drawMask) {
+		this.drawMask = drawMask;
 	}
 
 	public boolean isColorAgnostic() {
