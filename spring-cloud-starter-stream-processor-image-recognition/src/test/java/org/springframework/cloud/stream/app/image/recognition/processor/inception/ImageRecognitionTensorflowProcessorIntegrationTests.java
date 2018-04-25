@@ -63,7 +63,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=header"
 	})
@@ -89,7 +89,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 		}
 	}
 
-	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=payload"
 	})
@@ -111,7 +111,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 		}
 	}
 
-	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.image.recognition.responseSize=3"
 	})
