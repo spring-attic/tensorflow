@@ -21,13 +21,12 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
-import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -60,14 +59,14 @@ public class ImageRecognitionProcessorConfiguration {
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		logger.info("Load ImageRecognitionTensorflowInputConverter");
 		return new ImageRecognitionTensorflowInputConverter();
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new ImageRecognitionOutputMessageBuilder(properties.isDrawLabels(), commonProperties);
 	}
