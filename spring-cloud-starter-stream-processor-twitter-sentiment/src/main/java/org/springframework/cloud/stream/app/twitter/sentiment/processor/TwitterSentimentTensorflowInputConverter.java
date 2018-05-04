@@ -83,10 +83,13 @@ public class TwitterSentimentTensorflowInputConverter implements TensorflowInput
 			Map tweetJsonMap = null;
 
 			if (input instanceof byte[]) {
-				tweetJsonMap = objectMapper.readValue((byte[]) input, Map.class);
+				input = new String((byte[]) input);
 			}
-			else if (input instanceof String) {
-				tweetJsonMap = objectMapper.readValue((String) input, Map.class);
+
+			if (input instanceof String) {
+				Map tweetJsonMap = objectMapper.readValue((String) input, Map.class);
+				processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, tweetJsonMap);
+				return getStringObjectMap(tweetJsonMap);
 			}
 			else if (input instanceof Map) {
 				tweetJsonMap = (Map) input;
