@@ -81,6 +81,10 @@ public class TwitterSentimentTensorflowInputConverter implements TensorflowInput
 
 		try {
 
+			if (input instanceof byte[]) {
+				input = new String((byte[]) input);
+			}
+
 			if (input instanceof String) {
 				Map tweetJsonMap = objectMapper.readValue((String) input, Map.class);
 				processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, tweetJsonMap);
