@@ -69,7 +69,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=header"
 	})
@@ -112,7 +112,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 		}
 	}
 
-	//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=payload"
 	})
