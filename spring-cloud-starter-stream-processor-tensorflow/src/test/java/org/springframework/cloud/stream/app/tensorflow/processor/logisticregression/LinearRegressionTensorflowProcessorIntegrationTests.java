@@ -275,10 +275,6 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 
 			Tuple outputPayloadTuple = jsonToTuple.convert((byte[]) outputMessage.getPayload());
 
-//			assertEquals("Original Message Payload must be preserver in the output Tuple",
-//					outputPayloadTuple.getValue(TensorflowProcessorConfiguration.ORIGINAL_INPUT_DATA),
-//					inTuple);
-
 			assertThat(outputPayloadTuple.getFloat("myOutputName"), equalTo(0.29999298f));
 
 			assertThat(outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));

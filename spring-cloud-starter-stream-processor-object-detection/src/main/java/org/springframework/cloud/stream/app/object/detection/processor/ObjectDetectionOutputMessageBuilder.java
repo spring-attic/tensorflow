@@ -16,11 +16,14 @@
 
 package org.springframework.cloud.stream.app.object.detection.processor;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+
 import javax.imageio.ImageIO;
 
 import org.apache.commons.logging.Log;
@@ -48,12 +51,15 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 
 	private final boolean drawBoundingBox;
 
+	private boolean drawMask;
+
 	private final boolean agnosticColors;
 
-	public ObjectDetectionOutputMessageBuilder(boolean drawBoundingBox, boolean agnosticColors,
+	public ObjectDetectionOutputMessageBuilder(boolean drawBoundingBox, boolean drawMask, boolean agnosticColors,
 			TensorflowCommonProcessorProperties properties) {
 		super(properties);
 		this.drawBoundingBox = drawBoundingBox;
+		this.drawMask = drawMask;
 		this.agnosticColors = agnosticColors;
 	}
 
@@ -76,7 +82,7 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 
 				Tuple resultTuple = new JsonStringToTupleConverter().convert(result.toString());
 
-				ArrayList<Tuple> labels  = resultTuple.getValue("labels", ArrayList.class);
+				ArrayList<Tuple> labels = resultTuple.getValue("labels", ArrayList.class);
 				for (Tuple l : labels) {
 					int y1 = (int) (l.getFloat(1) * (float) originalImage.getHeight());
 					int x1 = (int) (l.getFloat(2) * (float) originalImage.getWidth());
@@ -90,6 +96,25 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 					String title = labelName + ": " + probability + "%";
 
 					GraphicsUtils.drawBoundingBox(originalImage, cid, title, x1, y1, x2, y2, agnosticColors);
+
+					if (this.drawMask && l.hasFieldName("mask")) {
+						float[][] mask = l.getValue("mask", float[][].class);
+						if (mask != null) {
+							Color maskColor = agnosticColors ? null : GraphicsUtils.getClassColor(cid);
+							BufferedImage maskImage = GraphicsUtils.createMaskImage(
+									mask, x2 - x1, y2 - y1, maskColor);
+							GraphicsUtils.overlayImages(originalImage, maskImage, x1, y1);
+						}
+					}
+				}
+
+				try {
+					File outputfile = new File("/Users/ctzolov/Dev/projects/scdf/spring-cloud-stream-app-starters" +
+							"/tensorflow2/spring-cloud-starter-stream-processor-object-detection/target/image-saved2.png");
+					ImageIO.write(originalImage, "png", outputfile);
+				}
+				catch (IOException e) {
+					e.printStackTrace();
 				}
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();

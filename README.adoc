@@ -19,9 +19,6 @@ To learn how to customize the processor for better fit different TensorFlow mode
 
 include::spring-cloud-starter-stream-processor-twitter-sentiment/README.adoc[]
 
-Video tutorial : link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
-
----
 image::{image-root}/VideoIcon.png[]
 Video Tutorial: link:https://www.youtube.com/watch?v=QzF2Iii4s5c[Real-time Twitter Sentiment Analytics with TensorFlow and Spring Cloud Dataflow]
 
@@ -34,11 +31,11 @@ Video tutorial : link:https://www.youtube.com/watch?v=bvDM7_CKQjo[Real-time imag
 
 ---
 
-*Object Detection Processor*  - Based on https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[Tensorflow Object Detection API] processor for localizing and identifying multiple objects in a single image.
+*Object Detection Processor*  - The https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/master/spring-cloud-starter-stream-processor-object-detection[Object Detection] processor provides out-of-the-box support for the https://github.com/tensorflow/models/blob/master/research/object_detection/README.md[TensorFlow Object Detection API]. It allows for real-time localization and identification of multiple objects in a single image or image stream. The Object Detection processor uses one of the pre-trained https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md[object detection] models and corresponding https://github.com/tensorflow/models/tree/865c14c/research/object_detection/data[object labels].
 include::spring-cloud-starter-stream-processor-object-detection/README.adoc[]
 
----
 
+Video Tutorial: link:https://www.youtube.com/watch?time_continue=2&v=2uOtImHKtgI[Real-time Object-Detection With Spring Cloud Stream]
 
 
 # ATTENTION!

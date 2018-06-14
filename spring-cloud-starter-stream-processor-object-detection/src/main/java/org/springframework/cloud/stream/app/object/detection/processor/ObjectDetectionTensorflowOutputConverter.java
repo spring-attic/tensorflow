@@ -123,7 +123,7 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 
 		try (Tensor<Float> scoresTensor = tensorMap.get(DETECTION_SCORES).expect(Float.class);
 			 Tensor<Float> classesTensor = tensorMap.get(DETECTION_CLASSES).expect(Float.class);
-			 Tensor<Float> boxesTensor = tensorMap.get(DETECTION_BOXES).expect(Float.class);
+			 Tensor<Float> boxesTensor = tensorMap.get(DETECTION_BOXES).expect(Float.class)
 		) {
 			// All these tensors have:
 			// - 1 as the first dimension
@@ -135,20 +135,6 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 			float[] classes = classesTensor.copyTo(new float[1][maxObjects])[0];
 			float[][] boxes = boxesTensor.copyTo(new float[1][maxObjects][4])[0];
 
-			// (Future work) enabler for supporting image-segmentation
-			if (modelFetch.contains(DETECTION_MASKS) && modelFetch.contains(NUM_DETECTIONS)) {
-				try (Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
-					 Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
-				) {
-					float nd = numDetections.copyTo(new float[1])[0];
-
-					if (masksTensor != null) {
-						float[][][] masks = masksTensor.copyTo(new float[1][maxObjects][33][33])[0];
-						logger.info(String.format("Num detections: %s, Masks: %s", nd, masks));
-					}
-				}
-			}
-
 			List<Tuple> tuples = new ArrayList<>();
 
 			// Collect only the objects whose scores are at above the configured confidence threshold.
@@ -157,14 +143,33 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 					String category = labels[(int) classes[i]];
 					float score = scores[i];
 
-					tuples.add(TupleBuilder.tuple()
+					TupleBuilder tb = TupleBuilder.tuple()
 							.put(category, score)
 							.put("x1", boxes[i][0])
 							.put("y1", boxes[i][1])
 							.put("x2", boxes[i][2])
 							.put("y2", boxes[i][3])
-							.put("cid", (int) classes[i])
-							.build());
+							.put("cid", (int) classes[i]);
+
+					// (Future work) enabler for supporting image-segmentation
+					if (modelFetch.contains(DETECTION_MASKS) && modelFetch.contains(NUM_DETECTIONS)) {
+						Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
+						Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
+//
+						//						try (Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
+//							 Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
+//						) {
+						float nd = numDetections.copyTo(new float[1])[0];
+
+						if (masksTensor != null) {
+							float[][][] masks = masksTensor.copyTo(new float[1][maxObjects][33][33])[0];
+							tb.put("mask", masks[i]);
+							logger.info(String.format("Num detections: %s, Masks: %s", nd, masks));
+						}
+//						}
+					}
+
+					tuples.add(tb.build());
 				}
 			}
 
