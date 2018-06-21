@@ -82,6 +82,7 @@
 				</repository>
 			</repositories>
 			<pluginRepositories>
+<pluginRepository><id>spring-releases></id><name>Spring Releases</name><url>http://repo.spring.io/libs-release</url></pluginRepository>
 				<pluginRepository>
 					<id>spring-snapshots</id>
 					<name>Spring Snapshots</name>
