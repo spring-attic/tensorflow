@@ -21,6 +21,7 @@
 		<module>spring-cloud-starter-stream-processor-twitter-sentiment</module>
 		<module>spring-cloud-starter-stream-processor-image-recognition</module>
 		<module>spring-cloud-starter-stream-processor-object-detection</module>
+		<module>spring-cloud-starter-stream-processor-pose-estimation</module>
 		<module>tensorflow-app-starters-test-support</module>
 	</modules>
 

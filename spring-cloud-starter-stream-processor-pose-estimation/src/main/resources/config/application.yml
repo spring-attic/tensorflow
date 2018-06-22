@@ -1,0 +1,7 @@
+tensorflow:
+  modelFetch: Openpose/concat_stage7
+  #model: http://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb
+  model: http://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb
+  pose:
+    estimation:
+      minBodyPartCount: 5

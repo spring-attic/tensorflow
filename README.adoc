@@ -37,4 +37,26 @@ include::spring-cloud-starter-stream-processor-object-detection/README.adoc[]
 
 Video Tutorial: link:https://www.youtube.com/watch?time_continue=2&v=2uOtImHKtgI[Real-time Object-Detection With Spring Cloud Stream]
 
+---
+
+*Pose Estimation Processor*
+
+[cols=2*]
+|===
+| image:images/VikiMaxiAdi.gif[]
+| The https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/master/spring-cloud-starter-stream-processor-pose-estimation[Pose Estimation]
+  is a real-time, multi-person body pose estimation processor for detecting human figures in images and video. Used to determine, where different body parts
+  are located in an image an how they spatially relate to each other.
+
+  Processor is inspired and based on
+
+  - https://arxiv.org/pdf/1611.08050.pdf[Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields]
+
+  - https://github.com/CMU-Perceptual-Computing-Lab/openpose[OpenPose]
+
+  - https://github.com/ildoonet/tf-pose-estimation[tf-pose-estimation]
+
+|===
+
+include::spring-cloud-starter-stream-processor-pose-estimation/README.adoc[]
 
