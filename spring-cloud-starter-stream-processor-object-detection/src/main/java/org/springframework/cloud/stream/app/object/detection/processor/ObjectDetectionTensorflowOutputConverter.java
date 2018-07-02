@@ -155,10 +155,6 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 					if (modelFetch.contains(DETECTION_MASKS) && modelFetch.contains(NUM_DETECTIONS)) {
 						Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
 						Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
-//
-						//						try (Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
-//							 Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
-//						) {
 						float nd = numDetections.copyTo(new float[1])[0];
 
 						if (masksTensor != null) {
@@ -166,7 +162,6 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 							tb.put("mask", masks[i]);
 							logger.info(String.format("Num detections: %s, Masks: %s", nd, masks));
 						}
-//						}
 					}
 
 					tuples.add(tb.build());

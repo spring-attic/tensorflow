@@ -20,7 +20,6 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -106,15 +105,6 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 							GraphicsUtils.overlayImages(originalImage, maskImage, x1, y1);
 						}
 					}
-				}
-
-				try {
-					File outputfile = new File("/Users/ctzolov/Dev/projects/scdf/spring-cloud-stream-app-starters" +
-							"/tensorflow2/spring-cloud-starter-stream-processor-object-detection/target/image-saved2.png");
-					ImageIO.write(originalImage, "png", outputfile);
-				}
-				catch (IOException e) {
-					e.printStackTrace();
 				}
 
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();

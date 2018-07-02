@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -52,7 +51,8 @@ import static org.hamcrest.Matchers.equalTo;
 		properties = {
 				//"tensorflow.modelFetch=detection_scores,detection_classes,detection_boxes,detection_masks,num_detections",
 				"tensorflow.modelFetch=detection_scores,detection_classes,detection_boxes,num_detections",
-				"tensorflow.model=http://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb",
+				//"tensorflow.model=http://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb",
+				"tensorflow.model=http://dl.bintray.com/big-data/generic/ssdlite_mobilenet_v2_coco_2018_05_09_frozen_inference_graph.pb",
 				//"tensorflow.model=file:/Users/ctzolov/Downloads/ssd_mobilenet_v2_coco_2018_03_29/frozen_inference_graph.pb",
 				"tensorflow.object.detection.labels=http://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt",
 				//"tensorflow.model=file:/Users/ctzolov/Downloads/mask_rcnn_resnet101_atrous_coco_2018_01_28/frozen_inference_graph.pb"
@@ -69,7 +69,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+	//@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=header"
 	})
@@ -84,23 +84,14 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 
 				testEvaluationWithOutputInHeader(
 						image, "{\"labels\":[" +
-								"{\"person\":0.99666023,\"x1\":0.7767177,\"y1\":0.15963306,\"x2\":0.9540965,\"y2\":0.20158374,\"cid\":1}," +
-								"{\"kite\":0.99346715,\"x1\":0.08797318,\"y1\":0.44025636,\"x2\":0.16985515,\"y2\":0.49672586,\"cid\":38}," +
-								"{\"person\":0.99229527,\"x1\":0.6840088,\"y1\":0.08519748,\"x2\":0.843071,\"y2\":0.12301033,\"cid\":1}," +
-								"{\"person\":0.9789544,\"x1\":0.56879956,\"y1\":0.06220094,\"x2\":0.629103,\"y2\":0.07995274,\"cid\":1}," +
-								"{\"kite\":0.96934885,\"x1\":0.26183245,\"y1\":0.2070512,\"x2\":0.3146273,\"y2\":0.22642946,\"cid\":38}," +
-								"{\"kite\":0.9462258,\"x1\":0.43824652,\"y1\":0.8026538,\"x2\":0.4702088,\"y2\":0.8175442,\"cid\":38}," +
-								"{\"kite\":0.92378986,\"x1\":0.37467834,\"y1\":0.3474477,\"x2\":0.3987156,\"y2\":0.36179984,\"cid\":38}," +
-								"{\"kite\":0.9130423,\"x1\":0.38156357,\"y1\":0.42770827,\"x2\":0.41003278,\"y2\":0.4449141,\"cid\":38}," +
-								"{\"kite\":0.89646775,\"x1\":0.41558802,\"y1\":0.22641928,\"x2\":0.45246547,\"y2\":0.24253754,\"cid\":38}," +
-								"{\"person\":0.83506095,\"x1\":0.601887,\"y1\":0.13212581,\"x2\":0.63641346,\"y2\":0.14473228,\"cid\":1}," +
-								"{\"person\":0.7343776,\"x1\":0.5767689,\"y1\":0.023850055,\"x2\":0.62417924,\"y2\":0.038195316,\"cid\":1}," +
-								"{\"person\":0.58631957,\"x1\":0.5590419,\"y1\":0.38939288,\"x2\":0.5883101,\"y2\":0.3997791,\"cid\":1}," +
-								"{\"person\":0.57765806,\"x1\":0.5586649,\"y1\":0.38527238,\"x2\":0.58879423,\"y2\":0.3959817,\"cid\":1}," +
-								"{\"person\":0.572748,\"x1\":0.5611651,\"y1\":0.3912078,\"x2\":0.59040546,\"y2\":0.4047312,\"cid\":1}," +
-								"{\"person\":0.55604917,\"x1\":0.54020363,\"y1\":0.25858936,\"x2\":0.5598617,\"y2\":0.2650398,\"cid\":1}," +
-								"{\"kite\":0.46935454,\"x1\":0.4220001,\"y1\":0.5656192,\"x2\":0.43472755,\"y2\":0.57504195,\"cid\":38}," +
-								"{\"person\":0.43634608,\"x1\":0.5645142,\"y1\":0.3955184,\"x2\":0.5911028,\"y2\":0.4101856,\"cid\":1}]}"
+								"{\"kite\":0.86736834,\"x1\":0.081495196,\"y1\":0.44308645,\"x2\":0.169772,\"y2\":0.5014239,\"cid\":38}," +
+								"{\"kite\":0.80015683,\"x1\":0.37845963,\"y1\":0.34496674,\"x2\":0.4024166,\"y2\":0.3610665,\"cid\":38}," +
+								"{\"person\":0.78764266,\"x1\":0.5630007,\"y1\":0.39138338,\"x2\":0.59502745,\"y2\":0.40834948,\"cid\":1}," +
+								"{\"person\":0.72429323,\"x1\":0.6802319,\"y1\":0.08181208,\"x2\":0.8319267,\"y2\":0.12482223,\"cid\":1}," +
+								"{\"person\":0.6290598,\"x1\":0.57875264,\"y1\":0.059143394,\"x2\":0.61880136,\"y2\":0.075514555,\"cid\":1}," +
+								"{\"person\":0.6122512,\"x1\":0.5782344,\"y1\":0.025721392,\"x2\":0.6188131,\"y2\":0.04140707,\"cid\":1}," +
+								"{\"kite\":0.60772866,\"x1\":0.27496636,\"y1\":0.20563951,\"x2\":0.31009442,\"y2\":0.22761866,\"cid\":38}," +
+								"{\"person\":0.5325224,\"x1\":0.76527464,\"y1\":0.15765251,\"x2\":0.9485351,\"y2\":0.20344453,\"cid\":1}]}"
 				);
 			}
 		}
@@ -112,7 +103,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 		}
 	}
 
-	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+	//@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=payload"
 	})
@@ -129,8 +120,8 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
 				Assert.assertThat(new String(received.getPayload()),
-						equalTo("{\"labels\":[{\"bear\":0.9999691," +
-								"\"x1\":0.072180204,\"y1\":0.2741249,\"x2\":0.893106,\"y2\":0.77897394,\"cid\":23}]}"));
+						equalTo("{\"labels\":[{\"bear\":0.9912719," +
+								"\"x1\":0.08205441,\"y1\":0.31035388,\"x2\":0.87202954,\"y2\":0.7736771,\"cid\":23}]}"));
 			}
 		}
 	}
