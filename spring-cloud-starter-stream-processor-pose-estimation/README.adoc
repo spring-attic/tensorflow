@@ -2,12 +2,17 @@
 :image-root: https://raw.githubusercontent.com/spring-cloud-stream-app-starters/tensorflow/master/images
 = Pose Estimation Processor
 
-The https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/master/spring-cloud-starter-stream-processor-pose-estimation[Pose Estimation]
-is a real-time, multi-person pose estimation processor for detecting human figures in images and video. Used for determining where different body parts
-are located in an image an how are they spatially relate to each other.
+[cols=2*]
+|===
+| image:../images/webcamPoseEstimationSmall.gif[]
+| The https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/master/spring-cloud-starter-stream-processor-pose-estimation[Pose Estimation]
+  is a real-time, multi-person pose estimation processor for detecting human figures in images and video. Used for determining where different body parts
+  are located in an image an how are they spatially relate to each other.
 
-Processor is based on the https://arxiv.org/pdf/1611.08050.pdf[Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields],
- https://github.com/CMU-Perceptual-Computing-Lab/openpose[OpenPose] and https://github.com/ildoonet/tf-pose-estimation[tf-pose-estimation].
+  Processor is based on the https://arxiv.org/pdf/1611.08050.pdf[Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields],
+   https://github.com/CMU-Perceptual-Computing-Lab/openpose[OpenPose] and https://github.com/ildoonet/tf-pose-estimation[tf-pose-estimation].
+|===
+
 
 The following diagram illustrates a Spring Cloud Data Flow streaming pipeline that predicts body postures from input images in real-time.
 
