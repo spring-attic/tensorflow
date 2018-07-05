@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
@@ -58,14 +57,14 @@ public class PoseEstimationProcessorConfiguration {
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		logger.info("Load PoseEstimationTensorflowInputConverter");
 		return new PoseEstimationTensorflowInputConverter(poseProperties);
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new PoseEstimateOutputMessageBuilder(poseProperties, commonProperties);
 	}

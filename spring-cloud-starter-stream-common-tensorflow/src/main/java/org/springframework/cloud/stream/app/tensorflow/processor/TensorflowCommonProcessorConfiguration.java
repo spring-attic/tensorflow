@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.context.annotation.Bean;
@@ -115,14 +114,14 @@ public class TensorflowCommonProcessorConfiguration {
 	 * @return a default output message builder
 	 */
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	@ConditionalOnMissingBean(name = "tensorflowOutputMessageBuilder")
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new DefaultOutputMessageBuilder(properties);
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public TensorFlowService tensorFlowService() throws IOException {
 		return new TensorFlowService(this.properties.getModel());
 	}
@@ -138,7 +137,7 @@ public class TensorflowCommonProcessorConfiguration {
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	@ConditionalOnMissingBean(name = "tensorflowInputConverter")
 	@SuppressWarnings("unchecked")
 	public TensorflowInputConverter tensorflowInputConverter() {

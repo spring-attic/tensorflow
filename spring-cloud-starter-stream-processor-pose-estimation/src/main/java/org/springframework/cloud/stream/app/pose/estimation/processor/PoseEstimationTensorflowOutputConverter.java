@@ -307,13 +307,13 @@ public class PoseEstimationTensorflowOutputConverter implements TensorflowOutput
 
 		AtomicInteger bodyId = new AtomicInteger();
 
-		Map<Part, Body> partToBodyMap = new ConcurrentHashMap<>();
+		Map<Part, Body> partToBodyIndex = new ConcurrentHashMap<>();
 
 		for (Model.LimbType limbType : limbsMap.keySet()) {
 			for (Limb limb : limbsMap.get(limbType)) {
 
-				Body fromBody = partToBodyMap.get(limb.getFromPart());
-				Body toBody = partToBodyMap.get(limb.getToPart());
+				Body fromBody = partToBodyIndex.get(limb.getFromPart());
+				Body toBody = partToBodyIndex.get(limb.getToPart());
 
 				Body bodyCandidate;
 
@@ -325,7 +325,7 @@ public class PoseEstimationTensorflowOutputConverter implements TensorflowOutput
 					if (!fromBody.equals(toBody)) {
 						bodyCandidate.getLimbs().addAll(toBody.getLimbs());
 						bodyCandidate.getParts().addAll(toBody.getParts());
-						toBody.getParts().forEach(p -> partToBodyMap.put(p, bodyCandidate));
+						toBody.getParts().forEach(p -> partToBodyIndex.put(p, bodyCandidate));
 					}
 				}
 				else {
@@ -333,16 +333,18 @@ public class PoseEstimationTensorflowOutputConverter implements TensorflowOutput
 				}
 
 				bodyCandidate.addLimb(limb);
-				partToBodyMap.put(limb.getFromPart(), bodyCandidate);
-				partToBodyMap.put(limb.getToPart(), bodyCandidate);
+				partToBodyIndex.put(limb.getFromPart(), bodyCandidate);
+				partToBodyIndex.put(limb.getToPart(), bodyCandidate);
 			}
 		}
 
 		// Filter out the body duplicates and bodies with too few parts
-		Set<Body> sb = partToBodyMap.values().stream()
+		List<Body> bodies = partToBodyIndex.values().stream()
+				.distinct()
 				.filter(body -> body.getParts().size() > poseProperties.getMinBodyPartCount())
-				.collect(Collectors.toSet());
+				.collect(Collectors.toList());
 
-		return sb.stream().collect(Collectors.toList());
+		return bodies;
 	}
+
 }

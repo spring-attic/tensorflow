@@ -21,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
@@ -56,7 +55,7 @@ public class TwitterSentimentProcessorConfiguration {
 	}
 
 	@Bean
-	@RefreshScope
+	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		if (logger.isInfoEnabled()) {
 			logger.info("Load vocabulary: " + properties.getVocabulary());
