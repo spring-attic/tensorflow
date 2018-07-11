@@ -18,7 +18,7 @@
 	</parent>
 
 	<properties>
-		<tensorflow.version>1.8.0</tensorflow.version>
+		<tensorflow.version>1.9.0-rc2</tensorflow.version>
 		<spring-cloud-stream.version>2.0.0.RELEASE</spring-cloud-stream.version>
 		<spring-cloud-bus.version>2.0.0.RC2</spring-cloud-bus.version>
 		<spring-cloud-common.version>2.0.0.RC2</spring-cloud-common.version>

@@ -4,8 +4,7 @@
 
 [cols=2*]
 |===
-| The https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/master/spring-cloud-starter-stream-processor-pose-estimation[Pose Estimation]
-  is a real-time, multi-person pose estimation processor for detecting human figures in images and video. Used for determining where different body parts
+| Real-time, multi-person Pose Estimation processor for detecting human figures in images and video. Used for determining where different body parts
   are located in an image an how are they spatially relate to each other.
 
   Processor is based on the https://arxiv.org/pdf/1611.08050.pdf[Realtime Multi-Person 2D Pose Estimation using Part Affinity Fields],
