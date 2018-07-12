@@ -90,6 +90,9 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 
 		@TestPropertySource(properties = {
 				"tensorflow.mode=header",
+				//"tensorflow.model=file:/Users/ctzolov/Dev/projects/tf-pose-estimation/models/graph/mobilenet_thin/graph_opt.pb",
+				//"tensorflow.model=file:/Users/ctzolov/Dev/projects/tf-pose-estimation/models/graph/cmu/graph_opt.pb",
+				"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb",
 
 				"tensorflow.pose.estimation.debugVisualisationEnabled=true",
 				"tensorflow.pose.estimation.minBodyPartCount=5",

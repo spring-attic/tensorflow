@@ -16,11 +16,13 @@
 
 package org.springframework.cloud.stream.app.object.detection.processor.detection;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -83,10 +85,13 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				byte[] image = StreamUtils.copyToByteArray(is);
 
 				channels.input().send(MessageBuilder.withPayload(image).build());
-				Message<?> received = messageCollector.forChannel(channels.output()).poll();
+				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
-				JSONObject expected = new JSONObject(JsonUtils.resourceToString("classpath:/test-object-detection.json"));
-				JSONAssert.assertEquals(expected, new JSONObject(new String(received.getHeaders().get("result").toString())), false);
+				System.out.println(received.getHeaders().get("result").toString());
+				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-object-detection.json"));
+				JSONAssert.assertEquals(expected, new JSONArray(received.getHeaders().get("result").toString()), false);
+
+				IOUtils.write(received.getPayload(), new FileOutputStream("./target/out2.jpg"));
 			}
 		}
 	}
@@ -105,10 +110,10 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 
 				channels.input().send(MessageBuilder.withPayload(image).build());
 
-				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
+				Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
 
-				JSONObject expected = new JSONObject(JsonUtils.resourceToString("classpath:/test-panda.json"));
-				JSONAssert.assertEquals(expected, new JSONObject(new String(received.getPayload())), false);
+				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-panda.json"));
+				JSONAssert.assertEquals(expected, new JSONArray(received.getPayload()), false);
 			}
 		}
 	}
