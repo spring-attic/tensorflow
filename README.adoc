@@ -38,8 +38,3 @@ include::spring-cloud-starter-stream-processor-object-detection/README.adoc[]
 Video Tutorial: link:https://www.youtube.com/watch?time_continue=2&v=2uOtImHKtgI[Real-time Object-Detection With Spring Cloud Stream]
 
 
-# ATTENTION!
-
-Do not attempt to use/build from `master`; the `master` branch is currently undergoing redesign to adapt to Spring Boot and Spring Cloud 2.0 stack. You'd notice discrepencies and/or test failures.
-
-Please use/build the 1.0.x branch or the http://repo.spring.io/libs-release/org/springframework/cloud/stream/app/[Celsius.SR1 release] of the applications - it is the latest GA release.
