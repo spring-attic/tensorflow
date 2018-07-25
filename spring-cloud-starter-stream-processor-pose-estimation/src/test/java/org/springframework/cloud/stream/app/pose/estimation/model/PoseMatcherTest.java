@@ -30,7 +30,6 @@ import org.springframework.core.io.DefaultResourceLoader;
  */
 public class PoseMatcherTest {
 
-
 	public static void main(String[] args) throws IOException {
 		Body[] bodies = new ObjectMapper().readValue(new DefaultResourceLoader().getResource("classpath:/pose-tourists.json").getInputStream(), Body[].class);
 
@@ -84,5 +83,4 @@ public class PoseMatcherTest {
 	private static String description(Rectangle rectangle) {
 		return String.format("%dx%dx%d", rectangle.x, rectangle.y, rectangle.width);
 	}
-
 }

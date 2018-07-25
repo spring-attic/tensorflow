@@ -158,7 +158,8 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 						float nd = numDetections.copyTo(new float[1])[0];
 
 						if (masksTensor != null) {
-							float[][][] masks = masksTensor.copyTo(new float[1][maxObjects][33][33])[0];
+							long[] shape = masksTensor.shape();
+							float[][][] masks = masksTensor.copyTo(new float[(int) shape[0]][(int) shape[1]][(int) shape[2]][(int) shape[3]])[0];
 							od.setMask(masks[i]);
 							logger.info(String.format("Num detections: %s, Masks: %s", nd, masks));
 						}
