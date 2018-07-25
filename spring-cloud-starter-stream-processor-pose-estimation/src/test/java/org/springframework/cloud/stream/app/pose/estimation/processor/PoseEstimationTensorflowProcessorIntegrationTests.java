@@ -53,7 +53,7 @@ import org.springframework.util.StreamUtils;
 		properties = {
 				"tensorflow.modelFetch=Openpose/concat_stage7",
 				"tensorflow.model=https://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb"
-//				"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
+				//"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
@@ -82,6 +82,7 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 				channels.input().send(MessageBuilder.withPayload(image).build());
 
 				Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
+				System.out.println(received.getPayload());
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/pose-tourists.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getPayload()), false);
 			}

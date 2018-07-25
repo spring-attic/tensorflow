@@ -30,9 +30,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Body {
 
-	private final int bodyId;
-	private final Set<Limb> limbs;
-	private final Set<Part> parts;
+	private int bodyId;
+	private Set<Limb> limbs;
+	private Set<Part> parts;
+
+	public Body() {
+	}
 
 	public Body(int bodyId) {
 		this.bodyId = bodyId;
@@ -40,8 +43,7 @@ public class Body {
 		this.parts = new HashSet<>();
 	}
 
-	@JsonIgnore
-	//@JsonProperty("id")
+	@JsonProperty("id")
 	public int getBodyId() {
 		return this.bodyId;
 	}
@@ -49,6 +51,14 @@ public class Body {
 	//@JsonProperty("parts")
 	@JsonIgnore
 	public Set<Part> getParts() {
+		if (this.parts == null && this.limbs != null) {
+			this.parts = new HashSet<>();
+			this.limbs.stream().forEach(l -> {
+						parts.add(l.getFromPart());
+						parts.add(l.getToPart());
+					}
+			);
+		}
 		return this.parts;
 	}
 
@@ -62,7 +72,6 @@ public class Body {
 		this.parts.add(limb.getFromPart());
 		this.parts.add(limb.getToPart());
 	}
-
 
 	@Override
 	public boolean equals(Object o) {

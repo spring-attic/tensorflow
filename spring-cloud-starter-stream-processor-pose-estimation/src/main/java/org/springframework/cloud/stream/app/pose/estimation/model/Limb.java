@@ -18,7 +18,6 @@ package org.springframework.cloud.stream.app.pose.estimation.model;
 
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -26,10 +25,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Limb {
 
-	private final Model.LimbType limbType;
-	private final float pafScore;
-	private final Part fromPart;
-	private final Part toPart;
+	private Model.LimbType limbType;
+	private float pafScore;
+	private Part fromPart;
+	private Part toPart;
+
+	public Limb() {
+	}
 
 	public Limb(Model.LimbType limbType, float pafScore, Part fromPartInstance, Part toPartInstance) {
 		this.limbType = limbType;
@@ -53,8 +55,7 @@ public class Limb {
 		return this.toPart;
 	}
 
-	@JsonIgnore
-	//@JsonProperty("type")
+	@JsonProperty("type")
 	public Model.LimbType getLimbType() {
 		return this.limbType;
 	}

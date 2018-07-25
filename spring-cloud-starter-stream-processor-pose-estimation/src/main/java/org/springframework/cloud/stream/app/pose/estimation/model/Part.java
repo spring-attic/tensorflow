@@ -26,11 +26,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Part {
 
-	private final Model.PartType partType;
-	private final int partId;
-	private final int y;
-	private final int x;
-	private final float confidence;
+	private Model.PartType partType;
+	private int partId;
+	private int y;
+	private int x;
+	private float confidence;
+
+	public Part() {
+	}
 
 	public Part(Model.PartType partType, int partInstanceId, int y, int x, float score) {
 		this.partType = partType;
@@ -40,7 +43,6 @@ public class Part {
 		this.confidence = score;
 	}
 
-	@JsonIgnore
 	public float getConfidence() {
 		return this.confidence;
 	}
@@ -50,27 +52,25 @@ public class Part {
 		return this.partType;
 	}
 
-	@JsonIgnore
+	//@JsonIgnore
 	public int getPartId() {
 		return this.partId;
 	}
 
-	@JsonIgnore
 	public int getY() {
 		return this.y;
 	}
 
-	@JsonIgnore
 	public int getX() {
 		return this.x;
 	}
 
-	@JsonProperty("y")
+	@JsonIgnore
 	public int getNormalizedY() {
 		return this.y * 8;
 	}
 
-	@JsonProperty("x")
+	@JsonIgnore
 	public int getNormalizedX() {
 		return this.x * 8;
 	}
