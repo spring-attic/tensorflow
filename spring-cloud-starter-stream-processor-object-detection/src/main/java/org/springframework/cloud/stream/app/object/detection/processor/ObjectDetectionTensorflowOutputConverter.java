@@ -28,17 +28,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tensorflow.Tensor;
 
+import org.springframework.cloud.stream.app.object.detection.mocel.ObjectDetection;
 import org.springframework.cloud.stream.app.object.detection.protos.StringIntLabelMapOuterClass;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
 import org.springframework.core.io.Resource;
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Converts the Tensorflow Object Detection result into {@link Tuple} object.
+ * Converts the Tensorflow Object Detection result into {@link ObjectDetection} list.
  * The pre-trained Object Detection models (http://bit.ly/2osxMAY) produce 3 tensor outputs:
  *  (1) detection_classes - containing the ids of detected objects, (2) detection_scores - confidence probabilities of the
  *  detected object and (3) detection_boxes - the object bounding boxes withing the images.
@@ -56,7 +55,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Tzolov
  */
-public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutputConverter<Tuple> {
+public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutputConverter<List<ObjectDetection>> {
 
 	private static final Log logger = LogFactory.getLog(ObjectDetectionTensorflowOutputConverter.class);
 
@@ -119,7 +118,7 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 	}
 
 	@Override
-	public Tuple convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
+	public List<ObjectDetection> convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
 
 		try (Tensor<Float> scoresTensor = tensorMap.get(DETECTION_SCORES).expect(Float.class);
 			 Tensor<Float> classesTensor = tensorMap.get(DETECTION_CLASSES).expect(Float.class);
@@ -135,7 +134,7 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 			float[] classes = classesTensor.copyTo(new float[1][maxObjects])[0];
 			float[][] boxes = boxesTensor.copyTo(new float[1][maxObjects][4])[0];
 
-			List<Tuple> tuples = new ArrayList<>();
+			List<ObjectDetection> objectDetections = new ArrayList<>();
 
 			// Collect only the objects whose scores are at above the configured confidence threshold.
 			for (int i = 0; i < scores.length; ++i) {
@@ -143,32 +142,35 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 					String category = labels[(int) classes[i]];
 					float score = scores[i];
 
-					TupleBuilder tb = TupleBuilder.tuple()
-							.put(category, score)
-							.put("x1", boxes[i][0])
-							.put("y1", boxes[i][1])
-							.put("x2", boxes[i][2])
-							.put("y2", boxes[i][3])
-							.put("cid", (int) classes[i]);
+					ObjectDetection od = new ObjectDetection();
+					od.setName(category);
+					od.setConfidence(score);
+					od.setX1(boxes[i][1]);
+					od.setY1(boxes[i][0]);
+					od.setX2(boxes[i][3]);
+					od.setY2(boxes[i][2]);
+					od.setCid((int) classes[i]);
 
-					// (Future work) enabler for supporting image-segmentation
+					// Mask allows image-segmentation
 					if (modelFetch.contains(DETECTION_MASKS) && modelFetch.contains(NUM_DETECTIONS)) {
 						Tensor<Float> masksTensor = tensorMap.get(DETECTION_MASKS).expect(Float.class);
 						Tensor<Float> numDetections = tensorMap.get(NUM_DETECTIONS).expect(Float.class);
 						float nd = numDetections.copyTo(new float[1])[0];
 
 						if (masksTensor != null) {
-							float[][][] masks = masksTensor.copyTo(new float[1][maxObjects][33][33])[0];
-							tb.put("mask", masks[i]);
+							long[] shape = masksTensor.shape();
+							float[][][] masks = masksTensor.copyTo(new float[(int) shape[0]][(int) shape[1]][(int) shape[2]][(int) shape[3]])[0];
+							od.setMask(masks[i]);
 							logger.info(String.format("Num detections: %s, Masks: %s", nd, masks));
 						}
 					}
 
-					tuples.add(tb.build());
+					objectDetections.add(od);
 				}
 			}
 
-			return TupleBuilder.tuple().of("labels", tuples);
+			return objectDetections;
+			//return TupleBuilder.tuple().of("labels", tuples);
 		}
 	}
 }

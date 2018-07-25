@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.stream.app.twitter.sentiment.processor;
+package org.springframework.cloud.stream.app.pose.estimation.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
@@ -31,36 +32,41 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 
 /**
- * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
- *
  * @author Christian Tzolov
  */
 @EnableBinding(Processor.class)
 @EnableConfigurationProperties({
-		TwitterSentimentProcessorProperties.class, TensorflowCommonProcessorProperties.class })
+		PoseEstimationProcessorProperties.class, TensorflowCommonProcessorProperties.class })
 @Import(TensorflowCommonProcessorConfiguration.class)
-public class TwitterSentimentProcessorConfiguration {
+public class PoseEstimationProcessorConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterSentimentProcessorConfiguration.class);
-
-	public static final String PROCESSOR_CONTEXT_TWEET_JSON_MAP = "tweetJsonMap";
+	private static final Log logger = LogFactory.getLog(PoseEstimationProcessorConfiguration.class);
 
 	@Autowired
-	private TwitterSentimentProcessorProperties properties;
+	private PoseEstimationProcessorProperties poseProperties;
+
+	@Autowired
+	private TensorflowCommonProcessorProperties commonProperties;
 
 	@Bean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
-		logger.info("Load TwitterSentimentTensorflowOutputConverter");
-		return new TwitterSentimentTensorflowOutputConverter();
+		if (logger.isInfoEnabled()) {
+			logger.info("Load PoseEstimationTensorflowOutputConverter ");
+		}
+		return new PoseEstimationTensorflowOutputConverter(poseProperties, commonProperties.getModelFetch());
 	}
 
 	@Bean
 	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
-		if (logger.isInfoEnabled()) {
-			logger.info("Load vocabulary: " + properties.getVocabulary());
-		}
-		return new TwitterSentimentTensorflowInputConverter(properties.getVocabulary());
+		logger.info("Load PoseEstimationTensorflowInputConverter");
+		return new PoseEstimationTensorflowInputConverter(poseProperties);
+	}
+
+	@Bean
+	//@RefreshScope
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new PoseEstimateOutputMessageBuilder(poseProperties, commonProperties);
 	}
 
 }

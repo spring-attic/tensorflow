@@ -65,7 +65,8 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
-			"tensorflow.mode=header"
+			"tensorflow.mode=header",
+			"tensorflow.image.recognition.responseSize=1"
 	})
 	public static class OutputInHeaderTests extends ImageRecognitionTensorflowProcessorIntegrationTests {
 
@@ -91,7 +92,8 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
-			"tensorflow.mode=payload"
+			"tensorflow.mode=payload",
+			"tensorflow.image.recognition.responseSize=1"
 	})
 	public static class OutputInPayloadTests extends ImageRecognitionTensorflowProcessorIntegrationTests {
 
