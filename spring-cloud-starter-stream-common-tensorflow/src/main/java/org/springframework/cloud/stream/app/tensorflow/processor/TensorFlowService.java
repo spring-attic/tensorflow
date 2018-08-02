@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +28,9 @@ import org.tensorflow.Session;
 import org.tensorflow.Session.Runner;
 import org.tensorflow.Tensor;
 
+import org.springframework.cloud.stream.app.tensorflow.util.ModelExtractor;
 import org.springframework.core.io.Resource;
 import org.springframework.tuple.Tuple;
-import org.springframework.util.StreamUtils;
 
 /**
  * @author Christian Tzolov
@@ -43,14 +41,13 @@ public class TensorFlowService implements AutoCloseable {
 
 	private Graph graph;
 
-	public TensorFlowService(Resource modelLocation) throws IOException {
-		try (InputStream is = modelLocation.getInputStream()) {
-			if (logger.isInfoEnabled()) {
-				logger.info("Loading TensorFlow graph model: " + modelLocation);
-			}
-			graph = new Graph();
-			graph.importGraphDef(StreamUtils.copyToByteArray(is));
+	public TensorFlowService(Resource modelLocation) {
+		if (logger.isInfoEnabled()) {
+			logger.info("Loading TensorFlow graph model: " + modelLocation);
 		}
+		graph = new Graph();
+		byte[] model = new ModelExtractor().getModel(modelLocation);
+		graph.importGraphDef(model);
 	}
 
 	/**
@@ -124,7 +121,7 @@ public class TensorFlowService implements AutoCloseable {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() {
 		logger.info("Close TensorFlow Graph!");
 		if (graph != null) {
 			graph.close();

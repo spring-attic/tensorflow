@@ -22,6 +22,7 @@
 		<spring-cloud-stream.version>2.0.0.RELEASE</spring-cloud-stream.version>
 		<spring-cloud-bus.version>2.0.0.RC2</spring-cloud-bus.version>
 		<spring-cloud-common.version>2.0.0.RC2</spring-cloud-common.version>
+		<commons-compress.version>1.17</commons-compress.version>
 	</properties>
 
 	<dependencyManagement>
@@ -96,6 +97,11 @@
 				<!--<artifactId>libtensorflow_jni_gpu</artifactId>-->
 				<!--<version>${tensorflow.version}</version>-->
 			<!--</dependency>-->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-compress</artifactId>
+				<version>${commons-compress.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud.stream.app</groupId>
 				<artifactId>tensorflow-app-starters-test-support</artifactId>
