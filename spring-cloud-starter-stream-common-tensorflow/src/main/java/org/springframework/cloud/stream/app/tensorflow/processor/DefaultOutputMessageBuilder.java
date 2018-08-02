@@ -18,8 +18,6 @@ package org.springframework.cloud.stream.app.tensorflow.processor;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
 import org.springframework.util.MimeTypeUtils;
 
 /**
@@ -30,16 +28,9 @@ import org.springframework.util.MimeTypeUtils;
  * The {@link OutputMode#header} stores the inference score inside a Message header with name {@link #outputName}.
  * In this case the output message payload copies the inbound message payload.
  *
- * The {@link OutputMode#tuple} uses a {@link Tuple} to store the inference score along with input message payload.
- * If the payload is already a tuple that contains an ORIGINAL_INPUT_DATA entry then copy the content of the input tuple
- * in the new tuple to be returned.
- *
  * @author Christian Tzolov
  */
 public class DefaultOutputMessageBuilder implements OutputMessageBuilder {
-
-	public static final String ORIGINAL_INPUT_DATA = "original.input.data";
-	public static final String APPLICATION_X_SPRING_TUPLE = "application/x-spring-tuple";
 
 	private OutputMode outputMode;
 
@@ -54,25 +45,6 @@ public class DefaultOutputMessageBuilder implements OutputMessageBuilder {
 	public MessageBuilder<?> createOutputMessageBuilder(Message<?> inputMessage, Object computedScore) {
 		switch (this.outputMode) {
 
-		case tuple:
-			TupleBuilder outTupleBuilder = TupleBuilder.tuple().put(this.outputName, computedScore);
-
-			Object inputPayload = inputMessage.getPayload();
-
-			if (inputPayload instanceof Tuple && ((Tuple) inputPayload).hasFieldName(ORIGINAL_INPUT_DATA)) {
-				// If the payload is already a tuple that contains ORIGINAL_INPUT_DATA entry then copy the
-				// content of the input tuple in the new tuple to be returned.
-				outTupleBuilder.putAll((Tuple) inputPayload);
-			}
-			else {
-				// This is a new tuple so preserve the input data.
-				outTupleBuilder.put(ORIGINAL_INPUT_DATA, inputPayload);
-			}
-
-			return MessageBuilder
-					.withPayload(outTupleBuilder.build())
-					.setHeader(MessageHeaders.CONTENT_TYPE, APPLICATION_X_SPRING_TUPLE);
-
 		case header:
 			MessageBuilder<?> builder = MessageBuilder
 					.withPayload(inputMessage.getPayload())
@@ -85,12 +57,8 @@ public class DefaultOutputMessageBuilder implements OutputMessageBuilder {
 		default: // payload mode
 			return MessageBuilder
 					.withPayload(computedScore)
-					.setHeader(MessageHeaders.CONTENT_TYPE, findContentType(computedScore));
+					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE);
 		}
 
-	}
-
-	private String findContentType(Object computedScore) {
-		return (computedScore instanceof Tuple) ? APPLICATION_X_SPRING_TUPLE : MimeTypeUtils.APPLICATION_JSON_VALUE;
 	}
 }

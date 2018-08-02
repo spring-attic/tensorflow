@@ -30,18 +30,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tensorflow.Tensor;
 
-import org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
 import org.springframework.core.io.Resource;
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
 import org.springframework.util.Assert;
 import org.springframework.util.StreamUtils;
 
 /**
  * @author Christian Tzolov
  */
-public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutputConverter<Tuple> {
+public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutputConverter<String> {
 
 	private static final Log logger = LogFactory.getLog(ImageRecognitionTensorflowOutputConverter.class);
 
@@ -63,7 +60,7 @@ public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutp
 	}
 
 	@Override
-	public Tuple convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
+	public String convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
 		Tensor tensor = tensorMap.entrySet().iterator().next().getValue();
 		final long[] rshape = tensor.shape();
 		if (tensor.numDimensions() != 2 || rshape[0] != 1) {
@@ -79,22 +76,21 @@ public class ImageRecognitionTensorflowOutputConverter implements TensorflowOutp
 
 		float[] labelProbabilities = ((float[][])tensor.copyTo(resultMatrix))[0];
 
-		List<Tuple> tuples =new ArrayList<>(responseSize);
+		List<String> entries = new ArrayList<>();
 		if (responseSize == 1) {
 			int maxProbabilityIndex = maxProbabilityIndex(labelProbabilities);
-			tuples.add(TupleBuilder.tuple().of(labels.get(maxProbabilityIndex), labelProbabilities[maxProbabilityIndex]));
+			entries.add(String.format("{\"%s\":%s}", labels.get(maxProbabilityIndex), labelProbabilities[maxProbabilityIndex]));
 		}
 		else {
 			List<Integer> topKProbabilities = indexesOfTopKProbabilities(labelProbabilities, responseSize);
 
 			for (int i = 0; i < topKProbabilities.size(); i++) {
 				int probabilityIndex = topKProbabilities.get(i);
-				tuples.add(TupleBuilder.tuple().of(labels.get(probabilityIndex), labelProbabilities[probabilityIndex]));
+				entries.add(String.format("{\"%s\":%s}", labels.get(probabilityIndex), labelProbabilities[probabilityIndex]));
 			}
 		}
 
-		return TupleBuilder.tuple().of("labels", tuples);
-
+		return String.format("{\"labels\":%s}", Arrays.toString(entries.toArray(new String[entries.size()]) ));
 	}
 
 	private List<Integer> indexesOfTopKProbabilities(final float[] probabilities, int k) {

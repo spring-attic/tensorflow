@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2018 the original author or authors.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,69 +16,52 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.tensorflow.DataType;
 import org.tensorflow.Tensor;
 import org.tensorflow.types.UInt8;
 
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
-
 /**
- * Utility that helps to covert {@link Tensor} to {@link Tuple} and in reverse.
+ * Utility that helps to covert {@link Tensor} to Json and in reverse.
  * @author Christian Tzolov
  */
-public class TensorTupleConverter {
+public class TensorJsonConverter {
 
-	public static final String TF_DATA_TYPE = "type";
-
-	public static final String TF_SHAPE = "shape";
-
-	public static final String TF_VALUE = "value";
-
-	public static Tuple toTuple(Tensor tensor) {
-		ByteBuffer buffer = ByteBuffer.allocate(tensor.numBytes());
-		tensor.writeTo(buffer);
+	public static String toJson(Tensor tensor) {
 
 		// Retrieve all bytes in the buffer
+		ByteBuffer buffer = ByteBuffer.allocate(tensor.numBytes());
+		tensor.writeTo(buffer);
 		buffer.clear();
 		byte[] bytes = new byte[buffer.capacity()];
-
 		buffer.get(bytes, 0, bytes.length);
 
 		long[] shape = tensor.shape();
-		return TupleBuilder.tuple()
-				.put(TF_DATA_TYPE, tensor.dataType().name())
-				.put(TF_SHAPE, shape)
-				.put(TF_VALUE, bytes)
-				.build();
+
+		String bytesBase64 = Base64.getEncoder().encodeToString(bytes);
+
+		return String.format("{ \"type\": \"%s\", \"shape\": %s, \"value\": \"%s\" }",
+				tensor.dataType().name(), Arrays.toString(shape), bytesBase64);
 	}
 
-	public static Tensor toTensor(Tuple tuple) {
+	public static Tensor toTensor(String json) {
 		try {
-			DataType dataType = DataType.valueOf(tuple.getString(TF_DATA_TYPE));
-			long[] shape = getShape(tuple);
-			byte[] tfValue = getTfValue(tuple);
+			JsonTensor jsonTensor = new ObjectMapper().readValue(json, JsonTensor.class);
+			DataType dataType = DataType.valueOf(jsonTensor.getType());
+			long[] shape = jsonTensor.getShape();
+			byte[] tfValue = Base64.getDecoder().decode(jsonTensor.getValue());
 			return Tensor.create(dataTypeToClass(dataType), shape, ByteBuffer.wrap(tfValue));
 		}
 		catch (Throwable throwable) {
-			throw new InvalidTupleTensorflowEncodingException(String.format("Can not covert tuple:'%s' into Tensor", tuple), throwable);
+			throw new RuntimeException(String.format("Can not covert json:'%s' into Tensor", json), throwable);
 		}
-	}
-
-	private static long[] getShape(Tuple tuple) {
-		Object shape = tuple.getValue(TF_SHAPE);
-		return (shape instanceof long[]) ? (long[]) shape :
-				((ArrayList<Long>) shape).stream().mapToLong(Long::longValue).toArray();
-	}
-
-	private static byte[] getTfValue(Tuple tuple) {
-		Object tfValue = tuple.getValue(TF_VALUE);
-		return tfValue instanceof String ? ((String) tfValue).getBytes() : (byte[]) tfValue;
 	}
 
 	private static final Map<DataType, Class<?>> typeToClassMap = new HashMap<>();
@@ -101,4 +84,14 @@ public class TensorTupleConverter {
 		return clazz;
 	}
 
+	public static void main(String[] args) throws IOException {
+		long[] l = new long[] { 1, 2, 3, 4 };
+		System.out.println(Arrays.toString(l));
+
+		String b = String.format("{ \"type\": \"%s\", \"shape\": %s, \"value\": \"%s\" }",
+				"myType", Arrays.toString(l), "boza");
+
+		JsonTensor jt = new ObjectMapper().readValue(b, JsonTensor.class);
+		System.out.println(jt.getShape().length);
+	}
 }

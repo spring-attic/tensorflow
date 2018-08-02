@@ -47,25 +47,21 @@ public class TensorflowCommonProcessorProperties {
 	private List<String> modelFetch;
 
 	/**
-	 * How to obtain the input data from the input message. If empty it defaults to the input message payload.
-	 * The payload.myInTupleName expression treats the input payload as a Tuple, and myInTupleName stands for
-	 * a Tuple key. The headers[myHeaderName] expression to get input data from message's header using
-	 * myHeaderName as a key.
+	 * How to obtain the input data from the input message. If empty it defaults to the input message payload. The
+	 * headers[myHeaderName] expression to get input data from message's header using myHeaderName as a key.
 	 */
 	private Expression expression;
 
 	/**
-	 * Defines how to store the output data and if the input payload is passed through or discarded.
-	 * Payload (Default) stores the output data in the outbound message payload. The input payload is discarded.
-	 * Header stores the output data in outputName message's header. The the input payload is passed through.
-	 * Tuple stores the output data in an Tuple payload, using the outputName key. The input payload is passed through
-	 * in the same Tuple using the 'original.input.data'. If the input payload is already a Tuple that contains
-	 * a 'original.input.data' key, then copy the input Tuple into the new Tuple to be returned.
+	 * The outbound message can store the inference result either in the payload or in a header with name outputName.
+	 * The payload mode (default) stores the inference result in the outbound message payload. The inbound payload is discarded.
+	 * The header mode stores the inference result in outbound message's header defined by the outputName property. The
+	 * the inbound message payload is passed through to the outbound such.
 	 */
 	private OutputMode mode = OutputMode.payload;
 
 	/**
-	 * The output data key used in the Header or Tuple modes.
+	 * The output data key used for the Header modes.
 	 */
 	private String outputName = "result";
 

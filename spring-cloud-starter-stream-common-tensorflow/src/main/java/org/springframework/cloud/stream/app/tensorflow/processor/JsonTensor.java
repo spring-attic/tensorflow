@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
 /**
+ * JSON serialization format for Tensor objects
  * @author Christian Tzolov
  */
-public class InvalidTupleTensorflowEncodingException extends RuntimeException {
+public class JsonTensor {
 
-	public InvalidTupleTensorflowEncodingException(String message) {
-		super(message);
+	private String type;
+	private long[] shape;
+	private String value;
+
+	public String getType() {
+		return type;
 	}
 
-	public InvalidTupleTensorflowEncodingException(String message, Throwable throwable) {
-		super(message, throwable);
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public long[] getShape() {
+		return shape;
+	}
+
+	public void setShape(long[] shape) {
+		this.shape = shape;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 }

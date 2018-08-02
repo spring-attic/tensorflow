@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -32,7 +31,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.converter.MessageConversionException;
-import org.springframework.tuple.Tuple;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -45,7 +43,7 @@ import org.springframework.tuple.Tuple;
  * The {@link TensorflowInputConverter} can be extended and customized.
  *
  * Processor's output uses the {@link TensorflowOutputConverter} to convert the computed {@link Tensor} result into a
- * serializable message. The default implementation converts the Tensor result into {@link Tuple} triple (see:
+ * serializable message. The default implementation converts the Tensor result into JSON (see:
  * {@link TensorflowOutputConverter}).
  *
  * The {@link TensorflowOutputConverter} can be extended and customized to provide a convenient data representations,
@@ -80,17 +78,15 @@ public class TensorflowProcessorConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
-		// Default implementations serializes the Tensor into Tuple
-		return (TensorflowOutputConverter<Tuple>) (tensorMap, processorContext) -> {
+		// Default implementations serializes the Tensor into Json
+		return (TensorflowOutputConverter<String>) (tensorMap, processorContext) -> {
 			Tensor<?> tensor = tensorMap.entrySet().iterator().next().getValue();
-			return TensorTupleConverter.toTuple(tensor);
+			return TensorJsonConverter.toJson(tensor);
 		};
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
 	@SuppressWarnings("unchecked")
 	public TensorflowInputConverter tensorflowInputConverter() {
 		return (input, processorContext) -> {
@@ -98,17 +94,8 @@ public class TensorflowProcessorConfiguration {
 			if (input instanceof Map) {
 				return (Map<String, Object>) input;
 			}
-			else if (input instanceof Tuple) {
-				Tuple tuple = (Tuple) input;
-				Map<String, Object> map = new LinkedHashMap<>(tuple.size());
-				for (int i = 0; i < tuple.size(); i++) {
-					map.put(tuple.getFieldNames().get(i), tuple.getValue(i));
-				}
-				return map;
-			}
 
 			throw new MessageConversionException("Unsupported input format: " + input);
 		};
 	}
-
 }
