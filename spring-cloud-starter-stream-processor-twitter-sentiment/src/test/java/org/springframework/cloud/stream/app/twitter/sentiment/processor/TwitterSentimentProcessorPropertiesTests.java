@@ -16,15 +16,15 @@
 
 package org.springframework.cloud.stream.app.twitter.sentiment.processor;
 
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Test;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Configuration;
+
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Christian Tzolov
@@ -34,7 +34,7 @@ public class TwitterSentimentProcessorPropertiesTests {
 	@Test
 	public void vocabularyCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(context, "tensorflow.twitter.vocabulary:/remote");
+		TestPropertyValues.of("tensorflow.twitter.vocabulary=/remote").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		TwitterSentimentProcessorProperties properties = context.getBean(TwitterSentimentProcessorProperties.class);

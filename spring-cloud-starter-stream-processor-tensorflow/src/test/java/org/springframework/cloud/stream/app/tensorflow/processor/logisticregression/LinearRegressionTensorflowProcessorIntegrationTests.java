@@ -35,6 +35,7 @@ import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.cloud.stream.test.binder.MessageCollector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
@@ -287,15 +288,13 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	public static class LogisticRegressionTensorflowProcessorApplication {
 
 		@Bean
-		public TensorflowOutputConverter tensorflowOutputConverter() {
-			return new TensorflowOutputConverter<Object>() {
-				@Override
-				public Object convert(Map<String, Tensor<?>> tensorMap, Map<String, Object> processorContext) {
-					Tensor tensor = tensorMap.entrySet().iterator().next().getValue();
-					float[] outputValue = new float[1];
-					tensor.copyTo(outputValue);
-					return outputValue[0];
-				}
+		@Primary
+		public TensorflowOutputConverter tensorflowOutputConverterX() {
+			return (TensorflowOutputConverter<Object>) (tensorMap, processorContext) -> {
+				Tensor tensor = tensorMap.entrySet().iterator().next().getValue();
+				float[] outputValue = new float[1];
+				tensor.copyTo(outputValue);
+				return outputValue[0];
 			};
 		}
 

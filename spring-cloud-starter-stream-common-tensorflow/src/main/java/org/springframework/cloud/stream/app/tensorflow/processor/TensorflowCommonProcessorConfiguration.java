@@ -17,7 +17,6 @@
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,7 +26,6 @@ import org.tensorflow.Tensor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Processor;
@@ -35,7 +33,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.tuple.Tuple;
 
@@ -74,15 +71,12 @@ public class TensorflowCommonProcessorConfiguration {
 	private TensorflowCommonProcessorProperties properties;
 
 	@Autowired
-	@Qualifier("tensorflowInputConverter")
 	private TensorflowInputConverter tensorflowInputConverter;
 
 	@Autowired
-	@Qualifier("tensorflowOutputConverter")
 	private TensorflowOutputConverter tensorflowOutputConverter;
 
 	@Autowired
-	@Qualifier("tensorflowOutputMessageBuilder")
 	private OutputMessageBuilder tensorflowOutputMessageBuilder;
 
 	@Autowired
@@ -110,52 +104,9 @@ public class TensorflowCommonProcessorConfiguration {
 
 	}
 
-	/**
-	 * @return a default output message builder
-	 */
 	@Bean
-	//@RefreshScope
-	@ConditionalOnMissingBean(name = "tensorflowOutputMessageBuilder")
-	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
-		return new DefaultOutputMessageBuilder(properties);
-	}
-
-	@Bean
-	//@RefreshScope
-	public TensorFlowService tensorFlowService() throws IOException {
+	public TensorFlowService tensorFlowService() {
 		return new TensorFlowService(this.properties.getModel());
 	}
 
-	@Bean
-	@ConditionalOnMissingBean(name = "tensorflowOutputConverter")
-	public TensorflowOutputConverter tensorflowOutputConverter() {
-		// Default implementations serializes the Tensor into Tuple
-		return (TensorflowOutputConverter<Tuple>) (tensorMap, processorContext) -> {
-			Tensor<?> tensor = tensorMap.entrySet().iterator().next().getValue();
-			return TensorTupleConverter.toTuple(tensor);
-		};
-	}
-
-	@Bean
-	//@RefreshScope
-	@ConditionalOnMissingBean(name = "tensorflowInputConverter")
-	@SuppressWarnings("unchecked")
-	public TensorflowInputConverter tensorflowInputConverter() {
-		return (input, processorContext) -> {
-
-			if (input instanceof Map) {
-				return (Map<String, Object>) input;
-			}
-			else if (input instanceof Tuple) {
-				Tuple tuple = (Tuple) input;
-				Map<String, Object> map = new LinkedHashMap<>(tuple.size());
-				for (int i = 0; i < tuple.size(); i++) {
-					map.put(tuple.getFieldNames().get(i), tuple.getValue(i));
-				}
-				return map;
-			}
-
-			throw new MessageConversionException("Unsupported input format: " + input);
-		};
-	}
 }

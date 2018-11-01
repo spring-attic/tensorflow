@@ -59,14 +59,12 @@ public class ImageRecognitionProcessorConfiguration {
 	}
 
 	@Bean
-	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		logger.info("Load ImageRecognitionTensorflowInputConverter");
 		return new ImageRecognitionTensorflowInputConverter();
 	}
 
 	@Bean
-	//@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new ImageRecognitionOutputMessageBuilder(properties.isDrawLabels(), commonProperties);
 	}

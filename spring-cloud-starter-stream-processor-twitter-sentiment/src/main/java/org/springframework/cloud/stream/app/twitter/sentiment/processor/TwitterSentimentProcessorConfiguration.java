@@ -20,8 +20,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.app.tensorflow.processor.DefaultOutputMessageBuilder;
+import org.springframework.cloud.stream.app.tensorflow.processor.OutputMessageBuilder;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorConfiguration;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowInputConverter;
@@ -46,7 +49,10 @@ public class TwitterSentimentProcessorConfiguration {
 	public static final String PROCESSOR_CONTEXT_TWEET_JSON_MAP = "tweetJsonMap";
 
 	@Autowired
-	private TwitterSentimentProcessorProperties properties;
+	private TensorflowCommonProcessorProperties commonProcessorProperties;
+
+	@Autowired
+	private TwitterSentimentProcessorProperties twitterSentimentProcessorProperties;
 
 	@Bean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
@@ -55,12 +61,17 @@ public class TwitterSentimentProcessorConfiguration {
 	}
 
 	@Bean
-	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		if (logger.isInfoEnabled()) {
-			logger.info("Load vocabulary: " + properties.getVocabulary());
+			logger.info("Load vocabulary: " + twitterSentimentProcessorProperties.getVocabulary());
 		}
-		return new TwitterSentimentTensorflowInputConverter(properties.getVocabulary());
+		return new TwitterSentimentTensorflowInputConverter(twitterSentimentProcessorProperties.getVocabulary());
 	}
+
+	@Bean
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new DefaultOutputMessageBuilder(commonProcessorProperties);
+	}
+
 
 }

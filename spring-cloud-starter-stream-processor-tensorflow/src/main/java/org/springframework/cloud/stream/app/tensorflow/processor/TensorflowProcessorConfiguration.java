@@ -16,17 +16,22 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.tensorflow.Tensor;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Processor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.tuple.Tuple;
 
 /**
@@ -61,4 +66,49 @@ public class TensorflowProcessorConfiguration {
 	public static final String ORIGINAL_INPUT_DATA = "original.input.data";
 
 	private static final Log logger = LogFactory.getLog(TensorflowProcessorConfiguration.class);
+
+	@Autowired
+	private TensorflowCommonProcessorProperties properties;
+
+	/**
+	 * @return a default output message builder
+	 */
+	@Bean
+	@ConditionalOnMissingBean
+	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
+		return new DefaultOutputMessageBuilder(properties);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public TensorflowOutputConverter tensorflowOutputConverter() {
+		// Default implementations serializes the Tensor into Tuple
+		return (TensorflowOutputConverter<Tuple>) (tensorMap, processorContext) -> {
+			Tensor<?> tensor = tensorMap.entrySet().iterator().next().getValue();
+			return TensorTupleConverter.toTuple(tensor);
+		};
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	@SuppressWarnings("unchecked")
+	public TensorflowInputConverter tensorflowInputConverter() {
+		return (input, processorContext) -> {
+
+			if (input instanceof Map) {
+				return (Map<String, Object>) input;
+			}
+			else if (input instanceof Tuple) {
+				Tuple tuple = (Tuple) input;
+				Map<String, Object> map = new LinkedHashMap<>(tuple.size());
+				for (int i = 0; i < tuple.size(); i++) {
+					map.put(tuple.getFieldNames().get(i), tuple.getValue(i));
+				}
+				return map;
+			}
+
+			throw new MessageConversionException("Unsupported input format: " + input);
+		};
+	}
+
 }

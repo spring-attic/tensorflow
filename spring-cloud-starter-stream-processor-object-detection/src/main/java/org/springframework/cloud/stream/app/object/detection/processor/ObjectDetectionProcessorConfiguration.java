@@ -60,14 +60,12 @@ public class ObjectDetectionProcessorConfiguration {
 	}
 
 	@Bean
-	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		logger.info("Load ObjectDetectionTensorflowInputConverter");
 		return new ObjectDetectionTensorflowInputConverter();
 	}
 
 	@Bean
-	//@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new ObjectDetectionOutputMessageBuilder(properties.isDrawBoundingBox(),
 				properties.isDrawMask(), properties.isColorAgnostic(), commonProperties);

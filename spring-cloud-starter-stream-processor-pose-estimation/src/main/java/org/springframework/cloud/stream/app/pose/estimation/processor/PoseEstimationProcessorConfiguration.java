@@ -57,14 +57,12 @@ public class PoseEstimationProcessorConfiguration {
 	}
 
 	@Bean
-	//@RefreshScope
 	public TensorflowInputConverter tensorflowInputConverter() {
 		logger.info("Load PoseEstimationTensorflowInputConverter");
 		return new PoseEstimationTensorflowInputConverter(poseProperties);
 	}
 
 	@Bean
-	//@RefreshScope
 	public OutputMessageBuilder tensorflowOutputMessageBuilder() {
 		return new PoseEstimateOutputMessageBuilder(poseProperties, commonProperties);
 	}
