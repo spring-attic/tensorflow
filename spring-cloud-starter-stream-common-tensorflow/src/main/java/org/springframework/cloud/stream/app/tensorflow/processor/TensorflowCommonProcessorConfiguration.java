@@ -34,7 +34,6 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.tuple.Tuple;
 
 /**
  * A processor that evaluates a machine learning model stored in TensorFlow's ProtoBuf format.
@@ -47,7 +46,7 @@ import org.springframework.tuple.Tuple;
  * The {@link TensorflowInputConverter} can be extended and customized.
  *
  * Processor's output uses the {@link TensorflowOutputConverter} to convert the computed {@link Tensor} result into a
- * serializable message. The default implementation converts the Tensor result into {@link Tuple} triple (see:
+ * serializable message. The default implementation converts the Tensor result into JSON (see:
  * {@link TensorflowOutputConverter}).
  *
  * The {@link TensorflowOutputConverter} can be extended and customized to provide a convenient data representations,
@@ -108,5 +107,4 @@ public class TensorflowCommonProcessorConfiguration {
 	public TensorFlowService tensorFlowService() {
 		return new TensorFlowService(this.properties.getModel());
 	}
-
 }

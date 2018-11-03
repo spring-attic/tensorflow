@@ -107,7 +107,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
-				Assert.assertThat(new String(received.getPayload()),
+				Assert.assertThat(received.getPayload(),
 						equalTo("{\"labels\":[{\"giant panda\":0.98649305}]}"));
 			}
 		}
@@ -129,10 +129,10 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
-				Assert.assertThat(new String(received.getPayload()),
+				Assert.assertThat(received.getPayload(),
 						equalTo("{\"labels\":[" +
-								"{\"giant panda\":0.98649305}," +
-								"{\"badger\":0.010562794}," +
+								"{\"giant panda\":0.98649305}, " +
+								"{\"badger\":0.010562794}, " +
 								"{\"ice bear\":0.001130851}]}"));
 			}
 		}

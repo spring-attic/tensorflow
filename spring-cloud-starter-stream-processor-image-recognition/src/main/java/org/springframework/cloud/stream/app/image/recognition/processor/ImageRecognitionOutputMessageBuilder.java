@@ -16,15 +16,21 @@
 
 package org.springframework.cloud.stream.app.image.recognition.processor;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import javax.imageio.ImageIO;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,8 +38,6 @@ import org.springframework.cloud.stream.app.tensorflow.processor.DefaultOutputMe
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.tuple.JsonStringToTupleConverter;
-import org.springframework.tuple.Tuple;
 
 /**
  * Extends the {@link DefaultOutputMessageBuilder} with ability to to augment the input image with the
@@ -85,15 +89,17 @@ public class ImageRecognitionOutputMessageBuilder extends DefaultOutputMessageBu
 				g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 				FontMetrics fm = g.getFontMetrics();
 
-				Tuple resultTuple = new JsonStringToTupleConverter().convert(result.toString());
-				ArrayList<Tuple> labels = (ArrayList) resultTuple.getValues().get(0);
+				Map<String, Object> resultMap = new ObjectMapper().readValue(result.toString(), Map.class);
+				List<Map<String, Double>> labelsList = (List<Map<String, Double>>) resultMap.get("labels");
 
 				int x = 1;
 				int y = 1;
-				for (Tuple l : labels) {
+				for (Map<String, Double> m : labelsList) {
 
-					String labelName = l.getFieldNames().get(0);
-					int probability = (int) (100 * l.getFloat(0));
+					Map.Entry<String, Double> l = m.entrySet().iterator().next();
+
+					String labelName = l.getKey();
+					int probability = (int) (100 * l.getValue());
 					String title = labelName + ": " + probability + "%";
 
 					Rectangle2D rect = fm.getStringBounds(title, g);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import org.springframework.tuple.Tuple;
-import org.tensorflow.Tensor;
-
 import java.util.Map;
+
+import org.tensorflow.Tensor;
 
 /**
  * The TensorFlow evaluation result is represented by a list of (non-serializable) {@link Tensor} instances.
@@ -27,19 +26,18 @@ import java.util.Map;
  * Implementations of this interface are responsible to convert the result {@link Tensor} instances into
  * a serializable type that can be send as a Message.
  *
- * The default implementation coverts the the {@link Tensor}s into {@link Tuple}. Each tensor is encoded as:
+ * The default implementation coverts the the {@link Tensor}s into JSON. Each tensor is encoded as:
  *
  * <li>
  *     	"type"  : TensorFlow {@link org.tensorflow.DataType} name
  *      "shape" : TensorFlow's shape
- *      "value" : ByteBuffer encoded Tensor's value.
+ *      "value" : Base64 encoded Tensor's value.
  * </li>
  *
- * It is the responsibility of the consumers of this message to decode the Tuple back into {@link Tensor} instance.
- * The helper {@link TensorTupleConverter#toTensor(Tuple)} static method helps to do this.
+ * It is the responsibility of the consumers of this message to decode the JSON back into {@link Tensor} instance.
+ * The helper {@link TensorJsonConverter#toTensor(String)} static method helps to do this.
  *
  * A better approach is to provide a custom {@link TensorflowOutputConverter} implementation.
- * @see <a href="http://bit.ly/2pKBghe">TwitterSentimentTensorflowOutputConverter.java</a> for how to build custom {@link TensorflowOutputConverter}.
  *
  * @author Christian Tzolov
  */

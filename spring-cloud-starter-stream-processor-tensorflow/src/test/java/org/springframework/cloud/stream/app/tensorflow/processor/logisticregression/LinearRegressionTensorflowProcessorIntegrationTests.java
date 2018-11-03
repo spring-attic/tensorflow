@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor.logisticregression;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter;
+import org.springframework.cloud.stream.app.tensorflow.processor.TensorJsonConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowOutputConverter;
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowProcessorConfiguration;
 import org.springframework.cloud.stream.messaging.Processor;
@@ -38,18 +39,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.tuple.JsonBytesToTupleConverter;
-import org.springframework.tuple.Tuple;
-import org.springframework.tuple.TupleBuilder;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_SHAPE;
-import static org.springframework.cloud.stream.app.tensorflow.processor.TensorTupleConverter.TF_VALUE;
 
 /**
  * Integration Tests for TensorflowProcessor.
@@ -87,31 +82,25 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-	private static JsonBytesToTupleConverter jsonToTuple = new JsonBytesToTupleConverter();
-
 	@Test
 	public void testEvaluationFloatInput() throws InterruptedException {
 		testEvaluation(0.7f);
 	}
 
-	//@Test
+	@Test
 	public void testEvaluationWithTensorInput() throws InterruptedException {
 		testEvaluation(Tensor.create(0.7f));
 	}
 
 	@Test
-	public void testEvaluationWithTupleInput() throws InterruptedException {
-		testEvaluation(TensorTupleConverter.toTuple(Tensor.create(0.7f)));
+	public void testEvaluationWithJsonInput() throws InterruptedException {
+		testEvaluation(TensorJsonConverter.toJson(Tensor.create(0.7f)));
 	}
 
 	@Test(expected = org.springframework.messaging.MessagingException.class)
-	public void testEvaluationIncorrectTupleInput() throws InterruptedException {
-		Tuple incompleteInputTuple = TupleBuilder.tuple()
-				//	missing data type
-				.put(TF_SHAPE, new long[0])
-				.put(TF_VALUE, new byte[0])
-				.build();
-		testEvaluation(incompleteInputTuple);
+	public void testEvaluationIncorrectJsonInput() throws InterruptedException {
+		String incompleteJson = String.format("{ \"shape\": %s, \"value\": \"%s\" }", Arrays.toString(new long[0]), "value");
+		testEvaluation(incompleteJson);
 	}
 
 	protected abstract void testEvaluation(Object input) throws InterruptedException;
@@ -167,63 +156,6 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 	}
 
 	@TestPropertySource(properties = {
-			"tensorflow.expression=headers[myInputData]",
-			"tensorflow.mode=tuple"
-	})
-	public static class HeaderInputTupleOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
-
-		@Override
-		protected void testEvaluation(Object input) throws InterruptedException {
-
-			Map<String, Object> inMap = new HashMap<>();
-			inMap.put("Placeholder", input);
-
-			Message<?> inputMessage = MessageBuilder
-					.withPayload("Dummy Payload")
-					.setHeader("myInputData", inMap)
-					.setHeader("passthrough", "passthrough")
-					.build();
-
-			channels.input().send(inputMessage);
-
-			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll(10, TimeUnit.SECONDS);
-
-			assertThat(outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
-
-			Tuple outputTuple = jsonToTuple.convert((byte[]) outputMessage.getPayload());
-			assertThat(outputTuple.getFloat("result"), equalTo(0.29999298f));
-			assertThat(inputMessage.getPayload(), equalTo("Dummy Payload"));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"tensorflow.expression=payload.testTupleValue",
-			"tensorflow.mode=tuple"
-	})
-	public static class TupleInputTupleOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
-
-		@Override
-		protected void testEvaluation(Object input) throws InterruptedException {
-
-			Tuple inTuple = TupleBuilder.tuple().of("testTupleValue", TupleBuilder.tuple().of("Placeholder", input));
-			Message<?> inputMessage = MessageBuilder
-					.withPayload(inTuple)
-					.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple")
-					.build();
-
-			channels.input().send(inputMessage);
-
-			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll(10, TimeUnit.SECONDS);
-
-			Tuple outputTuple = jsonToTuple.convert((byte[]) outputMessage.getPayload());
-			assertThat(outputTuple.getFloat("result"), equalTo(0.29999298f));
-
-			assertThat(inputMessage.getPayload(), equalTo(inTuple));
-		}
-	}
-
-
-	@TestPropertySource(properties = {
 			"tensorflow.mode=header"
 	})
 	public static class DefaultInputHeaderOutput extends LinearRegressionTensorflowProcessorIntegrationTests {
@@ -231,52 +163,23 @@ public abstract class LinearRegressionTensorflowProcessorIntegrationTests {
 		@Override
 		protected void testEvaluation(Object input) throws InterruptedException {
 
+			if (input instanceof Tensor) {
+				return; // Tensor input for Header mode is not valid.
+			}
 
-			//Tuple inTuple = TupleBuilder.tuple().of("testTupleValue", TupleBuilder.tuple().of("Placeholder", input));
-			Tuple inTuple = TupleBuilder.tuple().of("Placeholder", input);
+			Map<String, Object> inMap = new HashMap<>();
+			inMap.put("Placeholder", input);
 			Message<?> inputMessage = MessageBuilder
-					.withPayload(inTuple)
+					.withPayload(inMap)
 					.setHeader("passthrough", "passthrough")
-					.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple")
 					.build();
 
 			channels.input().send(inputMessage);
 
 			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll(10, TimeUnit.SECONDS);
-
-//			Tuple outputPayloadTuple = jsonToTuple.convert((byte[]) outputMessage.getPayload());
-//			assertEquals("Original Message Payload must be preserver", outputPayloadTuple, inTuple);
 
 			assertThat("Inference result must be stored in the header[myheader]",
 					outputMessage.getHeaders().get("result"), equalTo(0.29999298f));
-
-			assertThat(outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
-		}
-	}
-
-	@TestPropertySource(properties = {
-			"tensorflow.mode=tuple",
-			"tensorflow.outputName=myOutputName"
-	})
-	public static class DefaultInputTupleOutputWithName extends LinearRegressionTensorflowProcessorIntegrationTests {
-
-		@Override
-		protected void testEvaluation(Object input) throws InterruptedException {
-
-			Tuple inTuple = TupleBuilder.tuple().of("Placeholder", input);
-			Message<?> inputMessage = MessageBuilder
-					.withPayload(inTuple)
-					.setHeader("passthrough", "passthrough")
-					.setHeader(MessageHeaders.CONTENT_TYPE, "application/x-spring-tuple")
-					.build();
-
-			channels.input().send(inputMessage);
-
-			Message<?> outputMessage = messageCollector.forChannel(channels.output()).poll(10, TimeUnit.SECONDS);
-
-			Tuple outputPayloadTuple = jsonToTuple.convert((byte[]) outputMessage.getPayload());
-
-			assertThat(outputPayloadTuple.getFloat("myOutputName"), equalTo(0.29999298f));
 
 			assertThat(outputMessage.getHeaders().get("passthrough"), equalTo("passthrough"));
 		}

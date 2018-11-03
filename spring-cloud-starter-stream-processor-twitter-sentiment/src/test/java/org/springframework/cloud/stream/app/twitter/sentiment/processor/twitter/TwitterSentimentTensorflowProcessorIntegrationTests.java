@@ -61,7 +61,7 @@ public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
-//	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
+	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	public static class OutputInPayloadTests extends TwitterSentimentTensorflowProcessorIntegrationTests {
 
 		@Test

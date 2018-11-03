@@ -30,7 +30,7 @@ import org.tensorflow.Tensor;
 
 import org.springframework.cloud.stream.app.tensorflow.util.ModelExtractor;
 import org.springframework.core.io.Resource;
-import org.springframework.tuple.Tuple;
+import org.springframework.util.StreamUtils;
 
 /**
  * @author Christian Tzolov
@@ -54,7 +54,7 @@ public class TensorFlowService implements AutoCloseable {
 	 * Evaluates a pre-trained tensorflow model (encoded as {@link Graph}). Use the feeds parameter to feed in the
 	 * model input data and fetch-names to specify the output tensors.
 	 *
-	 * @param feeds Named map of input tensors. Tensors can be encoded as {@link Tensor} or {@link Tuple} objects.
+	 * @param feeds Named map of input tensors. Tensors can be encoded as {@link Tensor} or JSON string objects.
 	 * @param fetchedNames Names of the output tensors computed by the model.
 	 * @return Returns the computed output tensors. The names of the output tensors is defined by the fetchedNames
 	 * argument
@@ -104,17 +104,20 @@ public class TensorFlowService implements AutoCloseable {
 	}
 
 	/**
-	 * Convert an object into {@link Tensor} instance. Supports java primitive types, {@link Tuple} encoded
+	 * Convert an object into {@link Tensor} instance. Supports java primitive types, JSON string encoded
 	 * tensors or {@link Tensor} instances.
-	 * @param value Can be a java primitive type, {@link Tuple} encoded tensors or {@link Tensor} instances.
+	 * @param value Can be a java primitive type, JSON string encoded tensors or {@link Tensor} instances.
 	 * @return Tensor instance representing the input object value.
 	 */
 	private Tensor toFeedTensor(Object value) {
 		if (value instanceof Tensor) {
 			return (Tensor) value;
 		}
-		else if (value instanceof Tuple) {
-			return TensorTupleConverter.toTensor((Tuple) value);
+		else if (value instanceof String) {
+			return TensorJsonConverter.toTensor((String) value);
+		}
+		else if (value instanceof byte[]) {
+			return TensorJsonConverter.toTensor(new String((byte[]) value));
 		}
 
 		return Tensor.create(value);

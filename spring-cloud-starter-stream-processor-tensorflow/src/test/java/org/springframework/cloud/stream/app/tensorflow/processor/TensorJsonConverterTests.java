@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2017-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,17 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.tensorflow.Tensor;
 
-import org.springframework.tuple.Tuple;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * @author Christian Tzolov
  */
-public class TensorTupleConverterTests {
+public class TensorJsonConverterTests {
 
 	@Test
 	public void longArray() {
@@ -39,8 +38,8 @@ public class TensorTupleConverterTests {
 
 		Tensor inTensor = Tensor.create(inLongArray);
 
-		Tuple tuple = TensorTupleConverter.toTuple(inTensor);
-		Tensor outTensor = TensorTupleConverter.toTensor(tuple);
+		String jsonTensor = TensorJsonConverter.toJson(inTensor);
+		Tensor outTensor = TensorJsonConverter.toTensor(jsonTensor);
 
 		long[][] outLongArray = new long[2][2];
 		outLongArray = (long[][]) outTensor.copyTo(outLongArray);
@@ -55,9 +54,9 @@ public class TensorTupleConverterTests {
 
 		Tensor inTensor = Tensor.create(inLong);
 
-		Tuple tuple = TensorTupleConverter.toTuple(inTensor);
+		String jsonTensor = TensorJsonConverter.toJson(inTensor);
 
-		Tensor outTensor = TensorTupleConverter.toTensor(tuple);
+		Tensor outTensor = TensorJsonConverter.toTensor(jsonTensor);
 
 		compareTensors(inTensor, outTensor);
 		assertEquals(inLong, outTensor.longValue());

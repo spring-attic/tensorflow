@@ -170,7 +170,6 @@ public class ObjectDetectionTensorflowOutputConverter implements TensorflowOutpu
 			}
 
 			return objectDetections;
-			//return TupleBuilder.tuple().of("labels", tuples);
 		}
 	}
 }
