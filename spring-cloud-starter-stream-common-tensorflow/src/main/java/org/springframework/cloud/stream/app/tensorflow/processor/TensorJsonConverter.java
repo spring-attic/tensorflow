@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.stream.app.tensorflow.processor;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Base64;
@@ -82,16 +81,5 @@ public class TensorJsonConverter {
 			throw new IllegalArgumentException("No class found for dataType: " + dataType);
 		}
 		return clazz;
-	}
-
-	public static void main(String[] args) throws IOException {
-		long[] l = new long[] { 1, 2, 3, 4 };
-		System.out.println(Arrays.toString(l));
-
-		String b = String.format("{ \"type\": \"%s\", \"shape\": %s, \"value\": \"%s\" }",
-				"myType", Arrays.toString(l), "boza");
-
-		JsonTensor jt = new ObjectMapper().readValue(b, JsonTensor.class);
-		System.out.println(jt.getShape().length);
 	}
 }
