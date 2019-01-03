@@ -57,9 +57,6 @@
 					<generatedApps>
 						<object-detection-processor/>
 					</generatedApps>
-					<additionalAppProperties>
-						<additionalAppProperty>spring.cloud.stream.bindings.input.contentType=text/plain</additionalAppProperty>
-					</additionalAppProperties>
 				</configuration>
 			</plugin>
 			<!--<plugin>-->
