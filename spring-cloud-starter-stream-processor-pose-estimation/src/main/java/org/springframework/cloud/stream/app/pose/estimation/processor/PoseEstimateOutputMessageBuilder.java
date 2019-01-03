@@ -46,6 +46,8 @@ import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommo
 import org.springframework.cloud.stream.app.tensorflow.util.GraphicsUtils;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.util.MimeTypeUtils;
 
 /**
  * Extends the {@link DefaultOutputMessageBuilder} with ability to to augment the input image with the
@@ -79,7 +81,9 @@ public class PoseEstimateOutputMessageBuilder extends DefaultOutputMessageBuilde
 		if (this.poseProperties.isDrawPoses()) {
 			try {
 				byte[] annotatedImage = drawPoses((byte[]) inputMessage.getPayload(), bodies);
-				annotatedInput = MessageBuilder.withPayload(annotatedImage).build();
+				annotatedInput = MessageBuilder.withPayload(annotatedImage)
+						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE)
+						.build();
 			}
 			catch (IOException e) {
 				logger.error("Failed to draw the poses", e);

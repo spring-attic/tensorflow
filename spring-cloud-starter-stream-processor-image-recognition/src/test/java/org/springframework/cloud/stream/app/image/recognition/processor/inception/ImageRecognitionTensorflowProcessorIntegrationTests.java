@@ -35,9 +35,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StreamUtils;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -82,10 +84,12 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 		}
 
 		private void testEvaluationWithOutputInHeader(byte[] image, String resultJson) {
-			channels.input().send(MessageBuilder.withPayload(image).build());
+			channels.input().send(MessageBuilder.withPayload(image)
+					//.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE)
+					.build());
 
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
-			System.out.println(received.getHeaders().get("output"));
+
 			Assert.assertThat(received.getHeaders().get("result").toString(), equalTo(resultJson));
 		}
 	}

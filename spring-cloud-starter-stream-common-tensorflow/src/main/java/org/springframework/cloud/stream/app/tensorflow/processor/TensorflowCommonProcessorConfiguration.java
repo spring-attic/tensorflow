@@ -83,7 +83,7 @@ public class TensorflowCommonProcessorConfiguration {
 
 	@StreamListener(Processor.INPUT)
 	@SendTo(Processor.OUTPUT)
-	public Object evaluate(Message<?> input) {
+	public Object evaluate(Message<byte[]> input) {
 
 		Object inputData =
 				this.properties.getExpression() == null
