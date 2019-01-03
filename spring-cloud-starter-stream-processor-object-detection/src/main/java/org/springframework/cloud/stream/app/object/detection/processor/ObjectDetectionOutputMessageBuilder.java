@@ -35,6 +35,8 @@ import org.springframework.cloud.stream.app.tensorflow.processor.DefaultOutputMe
 import org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.util.MimeTypeUtils;
 
 /**
  * Extends the {@link DefaultOutputMessageBuilder} with ability to augment the input image with detected object
@@ -70,7 +72,9 @@ public class ObjectDetectionOutputMessageBuilder extends DefaultOutputMessageBui
 		List<ObjectDetection> objectDetections = (List<ObjectDetection>) computedScore;
 		if (this.drawBoundingBox) {
 			byte[] annotatedImage = drawBoundingBox((byte[]) inputMessage.getPayload(), objectDetections);
-			annotatedInput = MessageBuilder.withPayload(annotatedImage).build();
+			annotatedInput = MessageBuilder.withPayload(annotatedImage)
+					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE)
+					.build();
 		}
 
 		return super.createOutputMessageBuilder(annotatedInput, toJson(objectDetections));
