@@ -87,7 +87,6 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				channels.input().send(MessageBuilder.withPayload(image).build());
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
-				//System.out.println(received.getHeaders().get("result").toString());
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-object-detection.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getHeaders().get("result").toString()), false);
 

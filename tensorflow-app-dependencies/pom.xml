@@ -19,7 +19,6 @@
 
 	<properties>
 		<tensorflow.version>1.11.0</tensorflow.version>
-		<spring-cloud-stream.version>2.1.0.RC4</spring-cloud-stream.version>
 		<commons-compress.version>1.18</commons-compress.version>
 	</properties>
 
@@ -91,15 +90,9 @@
 				<version>2.1.0.BUILD-SNAPSHOT</version>
 				<scope>test</scope>
 			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-stream-test-support</artifactId>
-				<version>${spring-cloud-stream.version}</version>
-				<scope>test</scope>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
-	
+
 	<profiles>
 		<profile>
 			<id>spring</id>
