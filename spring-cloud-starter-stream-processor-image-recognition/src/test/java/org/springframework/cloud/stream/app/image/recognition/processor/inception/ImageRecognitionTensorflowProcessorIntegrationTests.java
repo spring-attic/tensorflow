@@ -52,9 +52,9 @@ import static org.hamcrest.Matchers.equalTo;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.model=http://dl.bintray.com/big-data/generic/tensorflow_inception_graph.pb",
+				"tensorflow.model=https://dl.bintray.com/big-data/generic/tensorflow_inception_graph.pb",
 				"tensorflow.modelFetch=output",
-				"tensorflow.image.recognition.labels=http://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt"
+				"tensorflow.image.recognition.labels=https://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt"
 		})
 @DirtiesContext
 public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {

@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
  * URI schemas are supported.
  *
  * Models can be extract either from raw files or form compressed archives. When  extracted from an archive the model
- * file name can optionally be provided as an URI fragment. For example for resource: http://myarchive.tar.gz#model.pb
+ * file name can optionally be provided as an URI fragment. For example for resource: https://myarchive.tar.gz#model.pb
  * the myarchive.tar.gz is traversed to uncompress and extract the model.pb file as byte array.
  * If the file name is not provided as URI fragment then the first file in the archive with extension .pb is extracted.
  *
