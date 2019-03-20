@@ -53,7 +53,7 @@ import org.springframework.util.StreamUtils;
 		properties = {
 				"tensorflow.modelFetch=Openpose/concat_stage7",
 				"tensorflow.model=https://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb"
-				//"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
+				//"tensorflow.model=https://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
 		})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
@@ -68,7 +68,7 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 			"tensorflow.mode=payload",
 			"tensorflow.pose.estimation.minBodyPartCount=5",
 			"tensorflow.pose.estimation.totalPafScoreThreshold=4.4",
-			//"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
+			//"tensorflow.model=https://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb"
 	})
 	public static class OutputInPayloadTests extends PoseEstimationTensorflowProcessorIntegrationTests {
 
@@ -92,7 +92,7 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 				"tensorflow.mode=header",
 				//"tensorflow.model=file:/Users/ctzolov/Dev/projects/tf-pose-estimation/models/graph/mobilenet_thin/graph_opt.pb",
 				//"tensorflow.model=file:/Users/ctzolov/Dev/projects/tf-pose-estimation/models/graph/cmu/graph_opt.pb",
-				"tensorflow.model=http://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb",
+				"tensorflow.model=https://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb",
 
 				"tensorflow.pose.estimation.debugVisualisationEnabled=true",
 				"tensorflow.pose.estimation.minBodyPartCount=5",

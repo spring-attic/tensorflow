@@ -1,8 +1,8 @@
 tensorflow:
   modelFetch: output
-  model: http://dl.bintray.com/big-data/generic/tensorflow_inception_graph.pb
+  model: https://dl.bintray.com/big-data/generic/tensorflow_inception_graph.pb
   image:
     recognition:
-      labels: http://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt
+      labels: https://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt
       responseSize: 3
       drawLabels: true
