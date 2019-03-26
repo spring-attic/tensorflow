@@ -39,7 +39,7 @@ import java.util.Map;
  * The helper {@link TensorTupleConverter#toTensor(Tuple)} static method helps to do this.
  *
  * A better approach is to provide a custom {@link TensorflowOutputConverter} implementation.
- * @see <a href="http://bit.ly/2pKBghe">TwitterSentimentTensorflowOutputConverter.java</a> for how to build custom {@link TensorflowOutputConverter}.
+ * @see <a href="https://bit.ly/2pKBghe">TwitterSentimentTensorflowOutputConverter.java</a> for how to build custom {@link TensorflowOutputConverter}.
  *
  * @author Christian Tzolov
  */

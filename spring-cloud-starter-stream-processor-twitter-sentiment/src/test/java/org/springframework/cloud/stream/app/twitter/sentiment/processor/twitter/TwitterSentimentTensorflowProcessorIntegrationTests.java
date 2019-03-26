@@ -48,9 +48,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.model=http://dl.bintray.com/big-data/generic/minimal_graph.proto",
+				"tensorflow.model=https://dl.bintray.com/big-data/generic/minimal_graph.proto",
 				"tensorflow.modelFetch=output/Softmax",
-				"tensorflow.twitter.vocabulary=http://dl.bintray.com/big-data/generic/vocab.csv"
+				"tensorflow.twitter.vocabulary=https://dl.bintray.com/big-data/generic/vocab.csv"
 		})
 @DirtiesContext
 @Ignore("Exclude the Twitter Sentiment Processor Integration Test until a proper Mock TF Model is provided!")
