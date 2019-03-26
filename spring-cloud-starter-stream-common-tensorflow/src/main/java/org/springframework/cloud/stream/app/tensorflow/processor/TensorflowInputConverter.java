@@ -28,7 +28,7 @@ import java.util.Map;
  * is encoded into key/value Map or flat key/value JSON message. Where each key in the map corresponds to a model input
  * placeholder and the value is compliant with TensorFlow's {@link org.tensorflow.DataType}.
  *
- *  @see <a href="http://bit.ly/2ox4IFG">TwitterSentimentTensorflowInputConverter.java</a> for how to build custom {@link TensorflowInputConverter}.
+ *  @see <a href="https://bit.ly/2ox4IFG">TwitterSentimentTensorflowInputConverter.java</a> for how to build custom {@link TensorflowInputConverter}.
  *
  * @author Christian Tzolov
  */
