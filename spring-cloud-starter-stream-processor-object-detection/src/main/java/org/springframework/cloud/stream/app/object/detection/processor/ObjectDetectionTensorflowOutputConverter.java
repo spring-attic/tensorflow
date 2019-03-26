@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * Converts the Tensorflow Object Detection result into {@link Tuple} object.
- * The pre-trained Object Detection models (http://bit.ly/2osxMAY) produce 3 tensor outputs:
+ * The pre-trained Object Detection models (https://bit.ly/2osxMAY) produce 3 tensor outputs:
  *  (1) detection_classes - containing the ids of detected objects, (2) detection_scores - confidence probabilities of the
  *  detected object and (3) detection_boxes - the object bounding boxes withing the images.
  *
