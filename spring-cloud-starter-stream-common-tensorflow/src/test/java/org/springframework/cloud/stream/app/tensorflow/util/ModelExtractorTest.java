@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.stream.app.tensorflow.util;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.core.io.DefaultResourceLoader;
@@ -29,6 +30,12 @@ import static org.junit.Assert.assertThat;
  * @author Christian Tzolov
  */
 public class ModelExtractorTest {
+
+	@BeforeClass
+	public static void beforeClass() {
+		// disabling HTTPS checks: https://stackoverflow.com/questions/19540289/how-to-fix-the-java-security-cert-certificateexception-no-subject-alternative
+		javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier((hostname, sslSession) -> true);
+	}
 
 	@Test
 	public void testResourceAndStringArguments() {
@@ -76,14 +83,14 @@ public class ModelExtractorTest {
 	@Test
 	public void tarGzipArchiveWithFragmentHttp() {
 		byte[] model = new ModelExtractor()
-				.getModel("http://download.tensorflow.org/models/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz#frozen_inference_graph.pb");
+				.getModel("https://download.tensorflow.org/models/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz#frozen_inference_graph.pb");
 		assertThat(model.length, is(8773281));
 	}
 
 	@Test
 	public void tarGzipArchiveWithDefaultExtensionHttp() {
 		byte[] model = new ModelExtractor()
-				.getModel("http://download.tensorflow.org/models/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz");
+				.getModel("https://download.tensorflow.org/models/deeplabv3_mnv2_pascal_train_aug_2018_01_29.tar.gz");
 		assertThat(model.length, is(8773281));
 	}
 }
