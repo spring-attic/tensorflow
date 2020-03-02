@@ -50,6 +50,11 @@
 					<generatedApps>
 						<twitter-sentiment-processor/>
 					</generatedApps>
+					<enableContainerImageMetadata>true</enableContainerImageMetadata>
+					<metadataSourceTypeFilters>
+						<filter>org.springframework.cloud.stream.app.twitter.sentiment.processor.TwitterSentimentProcessorProperties</filter>
+						<filter>org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties</filter>
+					</metadataSourceTypeFilters>
 				</configuration>
 			</plugin>
 		</plugins>

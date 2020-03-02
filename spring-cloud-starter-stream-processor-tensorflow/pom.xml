@@ -65,6 +65,10 @@
                             </extraTestConfigClass>
                         </tensorflow-processor>
                     </generatedApps>
+                    <enableContainerImageMetadata>true</enableContainerImageMetadata>
+                    <metadataSourceTypeFilters>
+                        <filter>org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties</filter>
+                    </metadataSourceTypeFilters>
                 </configuration>
             </plugin>
         </plugins>

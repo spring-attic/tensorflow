@@ -57,6 +57,11 @@
 					<generatedApps>
 						<object-detection-processor/>
 					</generatedApps>
+					<enableContainerImageMetadata>true</enableContainerImageMetadata>
+					<metadataSourceTypeFilters>
+						<filter>org.springframework.cloud.stream.app.object.detection.processor.ObjectDetectionProcessorProperties</filter>
+						<filter>org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties</filter>
+					</metadataSourceTypeFilters>
 				</configuration>
 			</plugin>
 			<!--<plugin>-->

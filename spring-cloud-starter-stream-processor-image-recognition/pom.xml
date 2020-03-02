@@ -51,6 +51,11 @@
 					<generatedApps>
 						<image-recognition-processor/>
 					</generatedApps>
+					<enableContainerImageMetadata>true</enableContainerImageMetadata>
+					<metadataSourceTypeFilters>
+						<filter>org.springframework.cloud.stream.app.image.recognition.processor.ImageRecognitionProcessorProperties</filter>
+						<filter>org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties</filter>
+					</metadataSourceTypeFilters>
 				</configuration>
 			</plugin>
 		</plugins>
