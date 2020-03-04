@@ -53,10 +53,6 @@
 						<pose-estimation-processor/>
 					</generatedApps>
 					<enableContainerImageMetadata>true</enableContainerImageMetadata>
-					<metadataSourceTypeFilters>
-						<filter>org.springframework.cloud.stream.app.pose.estimation.processor.PoseEstimationProcessorProperties</filter>
-						<filter>org.springframework.cloud.stream.app.tensorflow.processor.TensorflowCommonProcessorProperties</filter>
-					</metadataSourceTypeFilters>
 				</configuration>
 			</plugin>
 		</plugins>
