@@ -23,6 +23,7 @@ import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -64,6 +65,7 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector messageCollector;
 
+	@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 	@TestPropertySource(properties = {
 			"tensorflow.mode=payload",
 			"tensorflow.pose.estimation.minBodyPartCount=5",
@@ -88,6 +90,7 @@ public abstract class PoseEstimationTensorflowProcessorIntegrationTests {
 			}
 		}
 
+		@Ignore("Exclude the Processor Integration Test until a proper Mock TF Model is provided!")
 		@TestPropertySource(properties = {
 				"tensorflow.mode=header",
 				"tensorflow.model=https://storage.googleapis.com/scdf-tensorflow-models/pose-estimation/2018-05-14-cmu-graph_opt.pb",
