@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.app.object.detection.processor.ObjectDetectionOutputMessageBuilder;
 import org.springframework.cloud.stream.app.object.detection.processor.ObjectDetectionProcessorConfiguration;
 import org.springframework.cloud.stream.app.test.tensorflow.JsonUtils;
 import org.springframework.cloud.stream.messaging.Processor;
@@ -64,6 +67,8 @@ import org.springframework.util.StreamUtils;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 
+	private static final Log logger = LogFactory.getLog(ObjectDetectionTensorflowProcessorIntegrationTests.class);
+
 	@Autowired
 	protected Processor channels;
 
@@ -86,6 +91,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
 				System.out.println("test-object-detection.json= " + JsonUtils.resourceToString("classpath:/test-object-detection.json"));
+				logger.info("test-object-detection.json= " + JsonUtils.resourceToString("classpath:/test-object-detection.json"));
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-object-detection.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getHeaders().get("result").toString()), false);
 
@@ -111,6 +117,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
 
 				System.out.println("test-panda.json= " + JsonUtils.resourceToString("classpath:/test-panda.json"));
+				logger.info("test-panda.json= " + JsonUtils.resourceToString("classpath:/test-panda.json"));
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-panda.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getPayload()), false);
 			}
