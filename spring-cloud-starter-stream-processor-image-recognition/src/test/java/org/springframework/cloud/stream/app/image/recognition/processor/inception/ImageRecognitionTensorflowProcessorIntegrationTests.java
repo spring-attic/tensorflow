@@ -136,8 +136,8 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 				Assert.assertThat(received.getPayload(),
 						equalTo("{\"labels\":[" +
 								"{\"giant panda\":0.9864928}, " +
-								"{\"badger\":0.010562771}, " +
-								"{\"ice bear\":0.0011308475}]}"));
+								"{\"badger\":0.0105627915}, " +
+								"{\"ice bear\":0.0011308496}]}"));
 			}
 		}
 	}
