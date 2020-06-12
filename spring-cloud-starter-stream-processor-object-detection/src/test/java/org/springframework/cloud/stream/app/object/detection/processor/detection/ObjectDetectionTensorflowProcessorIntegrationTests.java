@@ -85,6 +85,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 				channels.input().send(MessageBuilder.withPayload(image).build());
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
+				System.out.println("test-object-detection.json= " + JsonUtils.resourceToString("classpath:/test-object-detection.json"));
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-object-detection.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getHeaders().get("result").toString()), false);
 
@@ -109,6 +110,7 @@ public abstract class ObjectDetectionTensorflowProcessorIntegrationTests {
 
 				Message<String> received = (Message<String>) messageCollector.forChannel(channels.output()).poll();
 
+				System.out.println("test-panda.json= " + JsonUtils.resourceToString("classpath:/test-panda.json"));
 				JSONArray expected = new JSONArray(JsonUtils.resourceToString("classpath:/test-panda.json"));
 				JSONAssert.assertEquals(expected, new JSONArray(received.getPayload()), false);
 			}
