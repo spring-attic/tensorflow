@@ -7,8 +7,8 @@ The new https://github.com/spring-cloud-stream-app-starters/tensorflow/tree/mast
 If the pre-trained model is not set explicitly set then following defaults are used:
 
 * `tensorflow.modelFetch` : `detection_scores,detection_classes,detection_boxes,num_detections`
-* `tensorflow.model` : `https://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb`
-* `tensorflow.object.detection.labels` : `https://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt`
+* `tensorflow.model` : `https://storage.googleapis.com/scdf-tensorflow-models/object-detection/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb`
+* `tensorflow.object.detection.labels` : `https://storage.googleapis.com/scdf-tensorflow-models/object-detection/mscoco_label_map.pbtxt`
 
 The following diagram illustrates a Spring Cloud Data Flow streaming pipeline that predicts object types from the images in real-time.
 
@@ -78,9 +78,9 @@ And here is a example pipeline that process images in `file` source and outputs 
 ```
 object-detector-stream=file --directory='/tmp/images'
 | object-detector --tensorflow.mode=header
-    --tensorflow.model='https://dl.bintray.com/big-data/generic/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb'
+    --tensorflow.model='https://storage.googleapis.com/scdf-tensorflow-models/object-detection/faster_rcnn_resnet101_coco_2018_01_28_frozen_inference_graph.pb'
     --tensorflow.model-fetch='detection_scores,detection_classes,detection_boxes'
-    --tensorflow.object.detection.labels='https://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt'
+    --tensorflow.object.detection.labels='https://storage.googleapis.com/scdf-tensorflow-models/object-detection/mscoco_label_map.pbtxt'
 | image-viewer
 ```
 

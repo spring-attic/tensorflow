@@ -48,9 +48,9 @@ import static org.hamcrest.Matchers.equalTo;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.model=https://dl.bintray.com/big-data/generic/minimal_graph.proto",
+				"tensorflow.model=https://storage.googleapis.com/scdf-tensorflow-models/twitter-sentiment/minimal_graph.proto",
 				"tensorflow.modelFetch=output/Softmax",
-				"tensorflow.twitter.vocabulary=https://dl.bintray.com/big-data/generic/vocab.csv"
+				"tensorflow.twitter.vocabulary=https://storage.googleapis.com/scdf-tensorflow-models/twitter-sentiment/vocab.csv"
 		})
 @DirtiesContext
 public abstract class TwitterSentimentTensorflowProcessorIntegrationTests {

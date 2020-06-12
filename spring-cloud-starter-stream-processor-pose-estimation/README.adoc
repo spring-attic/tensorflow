@@ -24,8 +24,8 @@ for selecting the right body parts and grouping them into poses are implemented 
 
 Use the `tensorflow.model` property to set the pre-trained Tensorflow model. Here are some options available out of the box:
 
-*  `https://dl.bintray.com/big-data/generic/2018-30-05-mobilenet_thin_graph_opt.pb` (default) - fast but less accurate
-*  `https://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb` - accurate but slower
+*  `https://storage.googleapis.com/scdf-tensorflow-models/pose-estimation/2018-30-05-mobilenet_thin_graph_opt.pb` (default) - fast but less accurate
+*  `https://storage.googleapis.com/scdf-tensorflow-models/pose-estimation/2018-05-14-cmu-graph_opt.pb` - accurate but slower
 
 Processor's input is an image byte array and the output is a JSON message and optionally an image with annotated body poses.
 The output JSON format looks like:
@@ -101,7 +101,7 @@ And here is a example pipeline that process images in `file` source and outputs 
 
 ```
 pose-estimation-stream=in: file --directory='/tmp/images'
-| pose-estimation --tensorflow.mode=header --tensorflow.model='https://dl.bintray.com/big-data/generic/2018-05-14-cmu-graph_opt.pb'
+| pose-estimation --tensorflow.mode=header --tensorflow.model='https://storage.googleapis.com/scdf-tensorflow-models/pose-estimation/2018-05-14-cmu-graph_opt.pb'
 | out: file --directory='/tmp/output' --name-expression='headers[file_name]'
 ```
 

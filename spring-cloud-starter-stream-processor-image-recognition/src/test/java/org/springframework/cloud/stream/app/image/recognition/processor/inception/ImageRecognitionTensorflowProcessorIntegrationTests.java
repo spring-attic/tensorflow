@@ -52,9 +52,9 @@ import static org.hamcrest.Matchers.equalTo;
 @SpringBootTest(
 		webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = {
-				"tensorflow.model=https://dl.bintray.com/big-data/generic/tensorflow_inception_graph.pb",
+				"tensorflow.model=https://storage.googleapis.com/scdf-tensorflow-models/image-recognition/tensorflow_inception_graph.pb",
 				"tensorflow.modelFetch=output",
-				"tensorflow.image.recognition.labels=https://dl.bintray.com/big-data/generic/imagenet_comp_graph_label_strings.txt"
+				"tensorflow.image.recognition.labels=https://storage.googleapis.com/scdf-tensorflow-models/image-recognition/imagenet_comp_graph_label_strings.txt"
 		})
 @DirtiesContext
 public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
@@ -79,7 +79,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 				byte[] image = StreamUtils.copyToByteArray(is);
 
 				testEvaluationWithOutputInHeader(
-						image, "{\"labels\":[{\"giant panda\":0.98649305}]}");
+						image, "{\"labels\":[{\"giant panda\":0.9864928}]}");
 			}
 		}
 
@@ -112,7 +112,7 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 				Message<byte[]> received = (Message<byte[]>) messageCollector.forChannel(channels.output()).poll();
 
 				Assert.assertThat(received.getPayload(),
-						equalTo("{\"labels\":[{\"giant panda\":0.98649305}]}"));
+						equalTo("{\"labels\":[{\"giant panda\":0.9864928}]}"));
 			}
 		}
 	}
@@ -135,9 +135,9 @@ public abstract class ImageRecognitionTensorflowProcessorIntegrationTests {
 
 				Assert.assertThat(received.getPayload(),
 						equalTo("{\"labels\":[" +
-								"{\"giant panda\":0.98649305}, " +
-								"{\"badger\":0.010562794}, " +
-								"{\"ice bear\":0.001130851}]}"));
+								"{\"giant panda\":0.9864928}, " +
+								"{\"badger\":0.010562771}, " +
+								"{\"ice bear\":0.0011308475}]}"));
 			}
 		}
 	}

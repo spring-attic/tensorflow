@@ -1,6 +1,6 @@
 tensorflow:
   modelFetch: detection_scores,detection_classes,detection_boxes,num_detections
-  model: https://dl.bintray.com/big-data/generic/ssdlite_mobilenet_v2_coco_2018_05_09_frozen_inference_graph.pb
+  model: http://download.tensorflow.org/models/object_detection/ssdlite_mobilenet_v2_coco_2018_05_09.tar.gz#frozen_inference_graph.pb
   object:
     detection:
-      labels: https://dl.bintray.com/big-data/generic/mscoco_label_map.pbtxt
+      labels: https://storage.googleapis.com/scdf-tensorflow-models/object-detection/mscoco_label_map.pbtxt
